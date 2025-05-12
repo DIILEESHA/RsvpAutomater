@@ -1,0 +1,27 @@
+/* src/App.css */
+.site-layout-content {
+  padding: 24px;
+  background: #fff;
+}
+
+.logo {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.ant-layout-header {
+  display: flex;
+  align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ant-layout-content {
+    padding: 0 16px;
+  }
+  
+  .site-layout-content {
+    padding: 16px;
+  }
+}
