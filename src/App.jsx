@@ -12,6 +12,7 @@ import GuestManager from "./components/GuestManager";
 import RSVPForm from "./components/RSVPForm";
 import Login from "./components/Login";
 import "./App.css";
+import ThankYouPage from "./components/ThankYouPage";
 
 const { Header, Content } = Layout;
 
@@ -25,7 +26,7 @@ function AppLayout() {
     <Layout className="layout">
       {!isRSVPPage && (
         <Header>
-        <h3 className="logo">Wedding RSVP</h3>
+          <h3 className="logo">Wedding RSVP</h3>
         </Header>
       )}
       <Content style={{ padding: "0 0px" }}>
@@ -34,7 +35,8 @@ function AppLayout() {
             <Route path="/" element={<Login />} />
             {/* <Route path="/dashboard" element={<AdminDashboard />} /> */}
             <Route path="/dashboard" element={<GuestManager />} />
-            <Route path="/rsvp/:guestId" element={<RSVPForm />} />
+            <Route path="/rsvp/:guestId" element={<RSVPForm />} />{" "}
+            <Route path="/thank-you" element={<ThankYouPage />} />
           </Routes>
         </div>
       </Content>

@@ -62,7 +62,7 @@ const AdminDashboard = () => {
       try {
         let q;
         
-        if (user?.email === 'dileeshawork@gmail.com') {
+        if (user?.email === 'bride@example.com') {
           q = query(collection(db, 'guests'), where('side', '==', 'bride'));
         } else if (user?.email === 'groom@example.com') {
           q = query(collection(db, 'guests'), where('side', '==', 'groom'));

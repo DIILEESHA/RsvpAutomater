@@ -19,6 +19,9 @@ import {
   Popover,
   List,
   Descriptions,
+  Checkbox,
+  Dropdown,
+  Menu,
 } from "antd";
 import {
   UploadOutlined,
@@ -31,6 +34,10 @@ import {
   QuestionOutlined,
   BellOutlined,
   EyeOutlined,
+  DownOutlined,
+  ExportOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import Papa from "papaparse";
 import {
@@ -42,10 +49,12 @@ import {
   query,
   where,
   getDocs,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { nanoid } from "nanoid";
 import notificationSound from "../assets/notification.mp3";
+import * as XLSX from "xlsx";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -78,7 +87,14 @@ const GuestManager = () => {
   const [uploading, setUploading] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
-
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [bulkUpdateModalVisible, setBulkUpdateModalVisible] = useState(false);
+  const [bulkUpdateEvents, setBulkUpdateEvents] = useState([]);
+  const [bulkUpdateSide, setBulkUpdateSide] = useState(null);
+  const [bulkUpdateAction, setBulkUpdateAction] = useState("add");
+  const [whatsappBaseUrl, setWhatsappBaseUrl] = useState(
+    "https://rsvp-automater.vercel.app/rsvp"
+  );
   const audio = new Audio(notificationSound);
 
   useEffect(() => {
@@ -87,6 +103,8 @@ const GuestManager = () => {
         ? `${window.location.protocol}//${window.location.host}/rsvp`
         : "https://rsvp-automater.vercel.app/rsvp"
     );
+
+    setWhatsappBaseUrl("https://rsvp-automater.vercel.app//rsvp");
 
     const unsubscribe = onSnapshot(collection(db, "guests"), (snapshot) => {
       const guestsData = snapshot.docs.map((doc) => ({
@@ -243,10 +261,9 @@ const GuestManager = () => {
       guest.name
     },%20You're%20invited%20to%20${
       guest.invitedEvents?.join("%20and%20") || "our wedding events"
-    }.%20RSVP:%20${baseUrl}/${guest.uniqueLink || "pending"}`;
+    }.%20RSVP:%20${whatsappBaseUrl}/${guest.uniqueLink || "pending"}`;
     window.open(url, "_blank");
   };
-
   const handleAddGuest = async () => {
     if (!newGuest.name || !newGuest.phone) {
       message.error("Name and phone number are required");
@@ -445,6 +462,141 @@ const GuestManager = () => {
           </div>
         </List.Item>
       )}
+    />
+  );
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+    selections: [
+      Table.SELECTION_ALL,
+      Table.SELECTION_INVERT,
+      Table.SELECTION_NONE,
+    ],
+  };
+
+  const handleBulkUpdate = async () => {
+    if (selectedRowKeys.length === 0) {
+      message.warning("Please select guests to update");
+      return;
+    }
+
+    try {
+      const batch = writeBatch(db);
+      const selectedGuests = guests.filter((guest) =>
+        selectedRowKeys.includes(guest.key)
+      );
+
+      selectedGuests.forEach((guest) => {
+        const guestRef = doc(db, "guests", guest.id || guest.key);
+        let updatedEvents = [...guest.invitedEvents];
+
+        if (bulkUpdateAction === "add") {
+          // Add events that aren't already present
+          bulkUpdateEvents.forEach((event) => {
+            if (!updatedEvents.includes(event)) {
+              updatedEvents.push(event);
+            }
+          });
+        } else if (bulkUpdateAction === "remove") {
+          // Remove selected events
+          updatedEvents = updatedEvents.filter(
+            (event) => !bulkUpdateEvents.includes(event)
+          );
+        } else if (bulkUpdateAction === "replace") {
+          // Replace all events with selected ones
+          updatedEvents = [...bulkUpdateEvents];
+        }
+
+        const updateData = {
+          invitedEvents: updatedEvents,
+          lastUpdated: new Date(),
+        };
+
+        if (bulkUpdateSide) {
+          updateData.side = bulkUpdateSide;
+        }
+
+        batch.update(guestRef, updateData);
+      });
+
+      await batch.commit();
+      message.success(
+        `Updated ${selectedGuests.length} guest${
+          selectedGuests.length !== 1 ? "s" : ""
+        } successfully`
+      );
+      setBulkUpdateModalVisible(false);
+      setSelectedRowKeys([]);
+      setBulkUpdateEvents([]);
+      setBulkUpdateSide(null);
+    } catch (error) {
+      message.error("Error updating guests");
+      console.error(error);
+    }
+  };
+
+  const exportToCSV = () => {
+    if (filteredGuests.length === 0) {
+      message.warning("No data to export");
+      return;
+    }
+
+    const data = filteredGuests.map((guest) => {
+      const rsvpStatus = {};
+      events.forEach((event) => {
+        rsvpStatus[`${event}_status`] = guest.rsvpStatus?.[event] || "pending";
+        rsvpStatus[`${event}_additional`] =
+          guest.additionalGuests?.[event] || 0;
+      });
+
+      return {
+        Name: guest.name,
+        Phone: guest.phone,
+        Email: guest.email || "",
+        Side: guest.side,
+        "Invited Events": guest.invitedEvents?.join(", ") || "",
+        "Unique Link": `${baseUrl}/${guest.uniqueLink}`,
+        ...rsvpStatus,
+        "Dietary Preferences": guest.dietaryPreferences || "",
+        "Special Requirements": guest.specialRequirements || "",
+        "Last Updated": guest.lastUpdated
+          ? new Date(guest.lastUpdated).toLocaleString()
+          : "",
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Guests");
+    XLSX.writeFile(wb, "wedding_guests.xlsx");
+    message.success("Exported to Excel successfully");
+  };
+
+  const exportToExcel = () => {
+    exportToCSV(); // Using the same function since XLSX handles both
+  };
+
+  const exportMenu = (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: "Export to Excel",
+          icon: <ExportOutlined />,
+          onClick: exportToExcel,
+        },
+        {
+          key: "2",
+          label: "Export to CSV",
+          icon: <ExportOutlined />,
+          onClick: exportToCSV,
+        },
+      ]}
     />
   );
 
@@ -662,6 +814,21 @@ const GuestManager = () => {
           Save Changes
         </Button>
 
+        {selectedRowKeys.length > 0 && (
+          <Button
+            type="primary"
+            onClick={() => setBulkUpdateModalVisible(true)}
+          >
+            Bulk Update ({selectedRowKeys.length})
+          </Button>
+        )}
+
+        <Dropdown overlay={exportMenu} trigger={["click"]}>
+          <Button icon={<ExportOutlined />}>
+            Export <DownOutlined />
+          </Button>
+        </Dropdown>
+
         <Input.Search
           placeholder="Search guests..."
           allowClear
@@ -777,6 +944,7 @@ const GuestManager = () => {
         columns={columns}
         dataSource={filteredGuests}
         rowKey="key"
+        rowSelection={rowSelection}
         pagination={{ pageSize: 10 }}
         scroll={{ x: true }}
         bordered
@@ -983,6 +1151,80 @@ const GuestManager = () => {
             </Descriptions.Item>
           </Descriptions>
         )}
+      </Modal>
+
+      {/* Bulk Update Modal */}
+      <Modal
+        title={`Bulk Update ${selectedRowKeys.length} Guest${
+          selectedRowKeys.length !== 1 ? "s" : ""
+        }`}
+        open={bulkUpdateModalVisible}
+        onOk={handleBulkUpdate}
+        onCancel={() => setBulkUpdateModalVisible(false)}
+        width={600}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div>
+            <label>Update Action</label>
+            <Select
+              style={{ width: "100%" }}
+              value={bulkUpdateAction}
+              onChange={setBulkUpdateAction}
+            >
+              <Option value="add">Add Events</Option>
+              <Option value="remove">Remove Events</Option>
+              <Option value="replace">Replace All Events</Option>
+            </Select>
+          </div>
+
+          <div>
+            <label>Events</label>
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              value={bulkUpdateEvents}
+              onChange={setBulkUpdateEvents}
+              placeholder="Select events to add"
+            >
+              {events.map((event) => (
+                <Option key={event} value={event}>
+                  {event.charAt(0).toUpperCase() + event.slice(1)}
+                </Option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <label>Update Side (Optional)</label>
+            <Select
+              style={{ width: "100%" }}
+              value={bulkUpdateSide}
+              onChange={setBulkUpdateSide}
+              placeholder="Select side"
+              allowClear
+            >
+              <Option value="groom">Groom's Side</Option>
+              <Option value="bride">Bride's Side</Option>
+            </Select>
+          </div>
+
+          <div>
+            <label>Selected Guests:</label>
+            <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+              <List
+                size="small"
+                dataSource={guests.filter((guest) =>
+                  selectedRowKeys.includes(guest.key)
+                )}
+                renderItem={(guest) => (
+                  <List.Item>
+                    {guest.name} ({guest.phone})
+                  </List.Item>
+                )}
+              />
+            </div>
+          </div>
+        </div>
       </Modal>
     </div>
   );

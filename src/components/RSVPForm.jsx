@@ -8,7 +8,7 @@ import {
   message,
   Spin,
   Alert,
-  Divider,
+  Typography,
 } from "antd";
 import { useParams } from "react-router-dom";
 import {
@@ -20,7 +20,9 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import "./RSVPForm.css"; // ← Import your custom style
+import "./RSVPForm.css";
+
+const { Title } = Typography;
 
 const RSVPForm = () => {
   const { guestId } = useParams();
@@ -93,13 +95,14 @@ const RSVPForm = () => {
     if (!guest) return;
     setSubmitting(true);
     try {
-      const updateData = {
-        rsvpStatus: values.events || {},
-        additionalGuests: values.additionalGuests || {},
-        dietaryPreferences: values.dietaryPreferences || "",
-        specialRequirements: values.specialRequirements || "",
-        lastUpdated: new Date().toISOString(),
-      };
+    const updateData = {
+  rsvpStatus: values.events || {},
+  additionalGuests: values.additionalGuests || {},
+  dietaryPreferences: values.dietaryPreferences || "",
+  specialRequirements: values.specialRequirements || "",
+  lastUpdated: new Date().toISOString(),
+};
+
 
       await updateDoc(doc(db, "guests", guest.id), updateData);
       message.success("Thank you for your RSVP!");
@@ -119,64 +122,57 @@ const RSVPForm = () => {
     return (
       <Spin
         tip="Loading RSVP..."
-        style={{ display: "block", margin: "20% auto",minHeight:"100vh" }}
+        style={{ display: "block", margin: "20% auto", minHeight: "100vh" }}
       />
     );
+
   if (error)
     return <Alert message="Error" description={error} type="error" showIcon />;
 
   return (
     <div className="rsvp-container">
-      <Card className="rsvp-card" title={`Hi ${guest?.name}!`}>
-        <p>
-          Please let us know if you'll be attending our wedding events:
-        </p>
+      <Card className="rsvp-card">
+        <Title level={3} className="rsvp-title">Hi {guest?.name}!</Title>
+        <p className="rsvp-subtext">Please let us know if you'll be attending our wedding events:</p>
 
         <Form form={form} onFinish={onFinish} layout="vertical">
           {guest?.invitedEvents?.map((event) => (
-            <div key={event} style={{ marginBottom: 24 }}>
-              <Divider orientation="left" plain>
+            <div key={event} className="rsvp-event">
+              <Title level={4} className="event-title">
                 {event.charAt(0).toUpperCase() + event.slice(1)}
-              </Divider>
+              </Title>
 
               <Form.Item
                 name={["events", event]}
                 label="Will you attend?"
                 rules={[{ required: true, message: "Please select an option" }]}
               >
-                <Radio.Group>
+                <Radio.Group className="rsvp-radio-group">
                   <Radio value="accepted">Yes, I'll be there</Radio>
                   <Radio value="rejected">No, I can't make it</Radio>
                 </Radio.Group>
               </Form.Item>
 
-              <Form.Item shouldUpdate>
-                {() => {
-                  const attendance = form.getFieldValue(["events", event]);
-                  return attendance === "accepted" ? (
-                    <Form.Item
-                      name={["additionalGuests", event]}
-                      label="Number of additional guests (max 4)"
-                      initialValue={0}
-                      rules={[
-                        {
-                          type: "number",
-                          min: 0,
-                          max: 4,
-                          message: "Please enter a number between 0 and 4",
-                          transform: (value) => Number(value),
-                        },
-                      ]}
-                    >
-                      <Input type="number" placeholder="0" />
-                    </Form.Item>
-                  ) : null;
-                }}
-              </Form.Item>
+            <Form.Item shouldUpdate>
+  {() => {
+    const attendance = form.getFieldValue(["events", event]);
+    return attendance === "accepted" ? (
+      <Form.Item
+        name={["additionalGuests", event]}
+        label="Number of additional guests"
+        initialValue={0} // Default value is 0
+      >
+        <Input type="number" placeholder="Enter number of guests" />
+      </Form.Item>
+    ) : null;
+  }}
+</Form.Item>
+
+
             </div>
           ))}
 
-          <Divider orientation="left">Extra Info</Divider>
+          <Title level={4} className="extra-title">Extra Info</Title>
 
           <Form.Item
             name="dietaryPreferences"
@@ -199,6 +195,7 @@ const RSVPForm = () => {
               size="large"
               loading={submitting}
               disabled={!guest}
+              block
             >
               Submit RSVP
             </Button>

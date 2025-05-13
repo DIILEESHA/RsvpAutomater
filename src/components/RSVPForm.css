@@ -1,67 +1,121 @@
 /* RSVPForm.css */
-
 .rsvp-container {
-  max-width: 700px;
-  margin: 40px auto;
-  padding: 0 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #a6c0fe, #f68084);
 }
 
 .rsvp-card {
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
-  padding: 20px;
-  background-color: #ffffff;
+  width: 100%;
+  max-width: 800px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  background-color: #fff;
+  border: none;
 }
+
 
 .rsvp-card .ant-card-head {
-  background: #fafafa;
-  border-radius: 10px 10px 0 0;
-  font-size: 22px;
-  font-weight: bold;
-  color: #333;
-  border-bottom: 1px solid #e8e8e8;
+  background-color: #f4f6f9;
+  border-bottom: 1px solid #e6e6e6;
+  border-radius: 20px 20px 0 0;
+  font-family: "silk";
 }
 
-.rsvp-card .ant-card-body {
-  padding: 24px;
+.rsvp-card .ant-card-head-title {
+  font-size: 28px;
+
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.rsvp-card p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #7f8c8d;
+}
+
+.ant-divider {
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 .ant-form-item-label > label {
-  font-weight: 600;
-  color: #555;
+  font-weight: 500;
+  color: #34495e;
 }
 
-.ant-radio-group {
-  display: flex;
-  gap: 20px;
+.ant-radio-wrapper {
+  font-size: 16px;
+  color: #34495e;
 }
 
 .ant-input,
 .ant-input-number,
 .ant-input-textarea {
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  border: 1px solid #dcdcdc;
+  transition: all 0.3s ease-in-out;
+}
+
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-input-textarea:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
 }
 
 .ant-btn-primary {
-  background-color: #1890ff;
-  border-color: #1890ff;
-  padding: 10px 25px;
-  font-size: 16px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #3498db, #2ecc71);
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  padding: 12px 28px;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
-  background-color: #40a9ff;
-  border-color: #40a9ff;
+  background: linear-gradient(135deg, #2ecc71, #3498db);
+  transform: scale(1.05);
 }
 
-.ant-divider-inner-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: #444;
+@media (max-width: 768px) {
+  .rsvp-card {
+    /* padding: 25px; */
+    padding: 20px;
+  }
+
+  .rsvp-card p{
+    width: 100%;
+  }
+
+  .rsvp-card .ant-card-head-title {
+    font-size: 22px;
+  }
+
+  .rsvp-container {
+    padding: 40px 16px;
+  }
+}
+
+.rsvp-event {
+  margin-bottom: 30px;
+}
+
+.event-title {
+  color: #2980b9;
+  font-size: 22px;
+}
+
+.extra-title {
+  color: #2c3e50;
+  font-size: 20px;
+  margin-top: 30px;
 }

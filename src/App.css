@@ -4,6 +4,19 @@
   background: #fff;
 }
 
+@font-face {
+  font-family: "silk";
+  src: url("./assets/silk.ttf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "hel";
+  src: url("./assets/hel.ttf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
 .logo {
   color: white;
   font-size: 20px;
@@ -20,8 +33,11 @@
   .ant-layout-content {
     padding: 0 16px;
   }
-  
+  .ant-card .ant-card-body {
+    padding: 0;
+  }
+
   .site-layout-content {
-    padding: 16px;
+    /* padding: 16px; */
   }
 }
