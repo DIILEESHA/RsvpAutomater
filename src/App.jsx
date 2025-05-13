@@ -1,5 +1,5 @@
 // src/App.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -20,7 +20,23 @@ const { Header, Content } = Layout;
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  if (!auth.currentUser) {
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  useEffect(() => {
+    // Check localStorage for auth status
+    const storedAuth = localStorage.getItem('isAuthenticated');
+    if (storedAuth === 'true') {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  if (isAuthenticated === null) {
+    return null; // or a loading spinner
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
   return children;
@@ -28,8 +44,6 @@ const ProtectedRoute = ({ children }) => {
 
 function AppLayout() {
   const location = useLocation();
-
-  // Check if the current route matches /rsvp/:guestId
   const isRSVPPage = location.pathname.startsWith("/rsvp");
 
   return (
