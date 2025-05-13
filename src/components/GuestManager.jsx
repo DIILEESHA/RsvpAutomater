@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from 'react-router-dom'
 import {
   Table,
   Button,
@@ -10,6 +11,7 @@ import {
   Statistic,
   Tooltip,
   Input,
+   Avatar,
   Row,
   Col,
   Tag,
@@ -43,6 +45,7 @@ import {
   DeleteOutlined,
   MoreOutlined,
   FilterOutlined,
+   UserOutlined, LogoutOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import Papa from "papaparse";
@@ -67,6 +70,7 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 
 const GuestManager = () => {
+   const navigate = useNavigate();
   const [guests, setGuests] = useState([]);
   const [events] = useState([
     "sangeet",
@@ -160,6 +164,16 @@ const GuestManager = () => {
       rsvpUnsubscribe();
     };
   }, []);
+
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const showGuestDetails = (guest) => {
     setSelectedGuest(guest);
@@ -619,7 +633,17 @@ const GuestManager = () => {
   const exportToExcel = () => {
     exportToCSV(); // Using the same function since XLSX handles both
   };
-
+  const menu = (
+    <Menu>
+      <Menu.Item 
+        key="logout" 
+        icon={<LogoutOutlined />} 
+        onClick={handleLogout}
+      >
+        Logout
+      </Menu.Item>
+    </Menu>
+  );
   const exportMenu = (
     <Menu
       items={[
@@ -833,6 +857,36 @@ const GuestManager = () => {
 
   return (
     <div className="pl">
+
+
+
+      <div>
+      <div style={{ 
+        textAlign: 'right', 
+        padding: '10px',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center'
+      }}>
+        <Dropdown 
+          overlay={menu} 
+          trigger={['click']}
+          placement="bottomRight"
+        >
+          <Avatar 
+            size="large" 
+            icon={<UserOutlined />} 
+            style={{ 
+              backgroundColor: '#1890ff',
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+            }}
+            className="profile-avatar"
+          />
+        </Dropdown>
+      </div>
+      {/* Rest of your GuestManager content */}
+    </div>
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={12} md={6}>
           <Card>
