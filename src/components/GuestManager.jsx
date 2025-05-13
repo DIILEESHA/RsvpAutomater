@@ -22,6 +22,8 @@ import {
   Checkbox,
   Dropdown,
   Menu,
+  Space,
+  Divider,
 } from "antd";
 import {
   UploadOutlined,
@@ -38,6 +40,10 @@ import {
   ExportOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  FilterOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import Papa from "papaparse";
 import {
@@ -50,6 +56,7 @@ import {
   where,
   getDocs,
   writeBatch,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { nanoid } from "nanoid";
@@ -92,9 +99,11 @@ const GuestManager = () => {
   const [bulkUpdateEvents, setBulkUpdateEvents] = useState([]);
   const [bulkUpdateSide, setBulkUpdateSide] = useState(null);
   const [bulkUpdateAction, setBulkUpdateAction] = useState("add");
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [whatsappBaseUrl, setWhatsappBaseUrl] = useState(
     "https://rsvp-automater.vercel.app/rsvp"
   );
+  const [mobileFilterVisible, setMobileFilterVisible] = useState(false);
   const audio = new Audio(notificationSound);
 
   useEffect(() => {
@@ -155,6 +164,35 @@ const GuestManager = () => {
   const showGuestDetails = (guest) => {
     setSelectedGuest(guest);
     setDetailModalVisible(true);
+  };
+
+  const handleDeleteGuest = async (guestId) => {
+    try {
+      await deleteDoc(doc(db, "guests", guestId));
+      message.success("Guest deleted successfully");
+    } catch (error) {
+      message.error("Error deleting guest");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedRowKeys.length === 0) {
+      message.warning("Please select guests to delete");
+      return;
+    }
+
+    try {
+      const batch = writeBatch(db);
+      selectedRowKeys.forEach((guestId) => {
+        batch.delete(doc(db, "guests", guestId));
+      });
+      await batch.commit();
+      message.success(`Deleted ${selectedRowKeys.length} guests successfully`);
+      setSelectedRowKeys([]);
+      setDeleteConfirmVisible(false);
+    } catch (error) {
+      message.error("Error deleting guests");
+    }
   };
 
   const handleUpload = async (info) => {
@@ -264,6 +302,7 @@ const GuestManager = () => {
     }.%20RSVP:%20${whatsappBaseUrl}/${guest.uniqueLink || "pending"}`;
     window.open(url, "_blank");
   };
+
   const handleAddGuest = async () => {
     if (!newGuest.name || !newGuest.phone) {
       message.error("Name and phone number are required");
@@ -600,6 +639,47 @@ const GuestManager = () => {
     />
   );
 
+  const actionMenu = (record) => (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: "View Details",
+          icon: <EyeOutlined />,
+          onClick: () => showGuestDetails(record),
+        },
+        {
+          key: "2",
+          label: "Send WhatsApp",
+          icon: <WhatsAppOutlined />,
+          onClick: () => sendWhatsApp(record),
+          disabled: !record.invitedEvents?.length || !record.phone,
+        },
+        {
+          key: "3",
+          label: "Copy RSVP Link",
+          icon: <CopyOutlined />,
+          onClick: () => copyToClipboard(`${baseUrl}/${record.uniqueLink}`),
+          disabled: !record.uniqueLink,
+        },
+        {
+          key: "4",
+          label: "Test RSVP Link",
+          icon: <LinkOutlined />,
+          onClick: () => testRSVPLink(record),
+          disabled: !record.invitedEvents?.length || !record.uniqueLink,
+        },
+        {
+          key: "5",
+          label: "Delete Guest",
+          icon: <DeleteOutlined />,
+          danger: true,
+          onClick: () => handleDeleteGuest(record.id),
+        },
+      ]}
+    />
+  );
+
   const columns = [
     {
       title: "Name",
@@ -682,7 +762,7 @@ const GuestManager = () => {
       key: "actions",
       width: 220,
       render: (_, record) => (
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <Space>
           <Tooltip title="View Full Details">
             <Button
               icon={<EyeOutlined />}
@@ -696,24 +776,60 @@ const GuestManager = () => {
               disabled={!record.invitedEvents?.length || !record.phone}
             />
           </Tooltip>
-          <Tooltip title="Copy RSVP Link">
-            <Button
-              icon={<CopyOutlined />}
-              onClick={() => copyToClipboard(`${baseUrl}/${record.uniqueLink}`)}
-              disabled={!record.uniqueLink}
-            />
-          </Tooltip>
-          <Tooltip title="Test RSVP Link">
-            <Button
-              icon={<LinkOutlined />}
-              onClick={() => testRSVPLink(record)}
-              disabled={!record.invitedEvents?.length || !record.uniqueLink}
-            />
-          </Tooltip>
-        </div>
+          <Dropdown overlay={actionMenu(record)} trigger={["click"]}>
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
+        </Space>
       ),
     },
   ];
+
+  const mobileFilterContent = (
+    <div style={{ padding: "10px" }}>
+      <Input.Search
+        placeholder="Search guests..."
+        allowClear
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ width: "100%", marginBottom: "10px" }}
+      />
+
+      <Select
+        placeholder="Filter by side"
+        style={{ width: "100%", marginBottom: "10px" }}
+        onChange={setSelectedSide}
+        allowClear
+      >
+        <Option value="groom">Groom's Side</Option>
+        <Option value="bride">Bride's Side</Option>
+      </Select>
+
+      <Select
+        mode="multiple"
+        placeholder="Filter by events"
+        style={{ width: "100%", marginBottom: "10px" }}
+        onChange={setSelectedEvents}
+        allowClear
+      >
+        {events.map((event) => (
+          <Option key={event} value={event}>
+            {event.charAt(0).toUpperCase() + event.slice(1)}
+          </Option>
+        ))}
+      </Select>
+
+      <Select
+        placeholder="RSVP Status"
+        style={{ width: "100%" }}
+        onChange={setSelectedRsvpStatus}
+        allowClear
+      >
+        <Option value="accepted">Accepted</Option>
+        <Option value="rejected">Rejected</Option>
+        <Option value="pending">Pending</Option>
+        <Option value="partial">Partial</Option>
+      </Select>
+    </div>
+  );
 
   return (
     <div style={{ padding: "20px" }}>
@@ -759,118 +875,259 @@ const GuestManager = () => {
         </Col>
       </Row>
 
+      {/* Desktop Action Buttons */}
       <div
+      className="samiya"
         style={{
           marginBottom: "20px",
-          display: "flex",
+          display: { xs: "none", sm: "flex" },
+          gap: "10px",
+          flexWrap: "nowrap",
+        }}
+      >
+        <div
+          style={{
+            marginBottom: "30px",
+            display: "flex",
+            gap: "20px",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Popover
+              content={notificationContent}
+              title="Recent RSVP Updates"
+              trigger="click"
+              open={notificationVisible}
+              onOpenChange={setNotificationVisible}
+            >
+              <Badge count={notifications.length} overflowCount={9}>
+                <Button
+                  type="text"
+                  icon={<BellOutlined />}
+                  onClick={() => setNotificationVisible(!notificationVisible)}
+                />
+              </Badge>
+            </Popover>
+
+            <Upload
+              accept=".csv"
+              beforeUpload={(file) => {
+                const isCSV =
+                  file.type === "text/csv" || file.name.endsWith(".csv");
+                if (!isCSV) {
+                  message.error("You can only upload CSV files!");
+                }
+                return isCSV || Upload.LIST_IGNORE;
+              }}
+              onChange={handleUpload}
+              showUploadList={false}
+              disabled={uploading}
+            >
+              <Button icon={<UploadOutlined />} loading={uploading}>
+                Import CSV
+              </Button>
+            </Upload>
+
+            <Dropdown overlay={exportMenu} trigger={["click"]}>
+              <Button icon={<ExportOutlined />}>
+                Export <DownOutlined />
+              </Button>
+            </Dropdown>
+          </div>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setIsModalVisible(true)}
+            >
+              Add Guest
+            </Button>
+
+            <Button
+              type="primary"
+              onClick={saveGuests}
+              disabled={!guests.length}
+            >
+              Save Changes
+            </Button>
+
+            {selectedRowKeys.length > 0 && (
+              <>
+                <Button
+                  type="primary"
+                  onClick={() => setBulkUpdateModalVisible(true)}
+                >
+                  Bulk Update ({selectedRowKeys.length})
+                </Button>
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => setDeleteConfirmVisible(true)}
+                >
+                  Delete ({selectedRowKeys.length})
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+        >
+          <Input.Search
+            placeholder="Search guests..."
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 200 }}
+          />
+
+          <Select
+            placeholder="Filter by side"
+            style={{ width: 150 }}
+            onChange={setSelectedSide}
+            allowClear
+          >
+            <Option value="groom">Groom's Side</Option>
+            <Option value="bride">Bride's Side</Option>
+          </Select>
+
+          <Select
+            mode="multiple"
+            placeholder="Filter by events"
+            style={{ width: 200 }}
+            onChange={setSelectedEvents}
+            allowClear
+          >
+            {events.map((event) => (
+              <Option key={event} value={event}>
+                {event.charAt(0).toUpperCase() + event.slice(1)}
+              </Option>
+            ))}
+          </Select>
+
+          <Select
+            placeholder="RSVP Status"
+            style={{ width: 150 }}
+            onChange={setSelectedRsvpStatus}
+            allowClear
+          >
+            <Option value="accepted">Accepted</Option>
+            <Option value="rejected">Rejected</Option>
+            <Option value="pending">Pending</Option>
+            <Option value="partial">Partial</Option>
+          </Select>
+        </div>
+      </div>
+
+      {/* Mobile Action Buttons */}
+      <div
+      className="bultiya"
+        style={{
+          marginBottom: "20px",
+          display: { xs: "flex", sm: "none" },
           gap: "10px",
           flexWrap: "wrap",
         }}
       >
-        <Popover
-          content={notificationContent}
-          title="Recent RSVP Updates"
-          trigger="click"
-          open={notificationVisible}
-          onOpenChange={setNotificationVisible}
-        >
-          <Badge count={notifications.length} overflowCount={9}>
-            <Button
-              type="text"
-              icon={<BellOutlined />}
-              onClick={() => setNotificationVisible(!notificationVisible)}
-            />
-          </Badge>
-        </Popover>
-
-        <Upload
-          accept=".csv"
-          beforeUpload={(file) => {
-            const isCSV =
-              file.type === "text/csv" || file.name.endsWith(".csv");
-            if (!isCSV) {
-              message.error("You can only upload CSV files!");
-            }
-            return isCSV || Upload.LIST_IGNORE;
-          }}
-          onChange={handleUpload}
-          showUploadList={false}
-          disabled={uploading}
-        >
-          <Button icon={<UploadOutlined />} loading={uploading}>
-            Import CSV
-          </Button>
-        </Upload>
-
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsModalVisible(true)}
-        >
-          Add Guest
-        </Button>
-
-        <Button type="primary" onClick={saveGuests} disabled={!guests.length}>
-          Save Changes
-        </Button>
-
-        {selectedRowKeys.length > 0 && (
-          <Button
-            type="primary"
-            onClick={() => setBulkUpdateModalVisible(true)}
+        <Space wrap>
+          <Popover
+            content={notificationContent}
+            title="Recent RSVP Updates"
+            trigger="click"
+            open={notificationVisible}
+            onOpenChange={setNotificationVisible}
           >
-            Bulk Update ({selectedRowKeys.length})
-          </Button>
-        )}
+            <Badge count={notifications.length} overflowCount={9}>
+              <Button
+                type="text"
+                icon={<BellOutlined />}
+                onClick={() => setNotificationVisible(!notificationVisible)}
+              />
+            </Badge>
+          </Popover>
 
-        <Dropdown overlay={exportMenu} trigger={["click"]}>
-          <Button icon={<ExportOutlined />}>
-            Export <DownOutlined />
-          </Button>
-        </Dropdown>
+          <Dropdown
+            overlay={
+              <Menu
+                items={[
+                  {
+                    key: "1",
+                    label: "Import CSV",
+                    icon: <UploadOutlined />,
+                    onClick: () =>
+                      document.querySelector('.mobile-upload input[type="file"]').click(),
+                  },
+                  {
+                    key: "2",
+                    label: "Add Guest",
+                    icon: <PlusOutlined />,
+                    onClick: () => setIsModalVisible(true),
+                  },
+                  {
+                    key: "3",
+                    label: "Save Changes",
+                    icon: <CheckOutlined />,
+                    onClick: saveGuests,
+                    disabled: !guests.length,
+                  },
+                  selectedRowKeys.length > 0 && {
+                    key: "4",
+                    label: "Bulk Update",
+                    icon: <CheckOutlined />,
+                    onClick: () => setBulkUpdateModalVisible(true),
+                  },
+                  selectedRowKeys.length > 0 && {
+                    key: "5",
+                    label: "Delete Selected",
+                    icon: <DeleteOutlined />,
+                    danger: true,
+                    onClick: () => setDeleteConfirmVisible(true),
+                  },
+                ].filter(Boolean)}
+              />
+            }
+            trigger={["click"]}
+          >
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
 
-        <Input.Search
-          placeholder="Search guests..."
-          allowClear
-          onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: 200 }}
-        />
+          <Upload
+            accept=".csv"
+            beforeUpload={(file) => {
+              const isCSV =
+                file.type === "text/csv" || file.name.endsWith(".csv");
+              if (!isCSV) {
+                message.error("You can only upload CSV files!");
+              }
+              return isCSV || Upload.LIST_IGNORE;
+            }}
+            onChange={handleUpload}
+            showUploadList={false}
+            disabled={uploading}
+            className="mobile-upload"
+            style={{ display: "none" }}
+          >
+            <Button icon={<UploadOutlined />} loading={uploading}>
+              Import CSV
+            </Button>
+          </Upload>
 
-        <Select
-          placeholder="Filter by side"
-          style={{ width: 150 }}
-          onChange={setSelectedSide}
-          allowClear
-        >
-          <Option value="groom">Groom's Side</Option>
-          <Option value="bride">Bride's Side</Option>
-        </Select>
+          <Dropdown overlay={exportMenu} trigger={["click"]}>
+            <Button icon={<ExportOutlined />} />
+          </Dropdown>
 
-        <Select
-          mode="multiple"
-          placeholder="Filter by events"
-          style={{ width: 200 }}
-          onChange={setSelectedEvents}
-          allowClear
-        >
-          {events.map((event) => (
-            <Option key={event} value={event}>
-              {event.charAt(0).toUpperCase() + event.slice(1)}
-            </Option>
-          ))}
-        </Select>
-
-        <Select
-          placeholder="RSVP Status"
-          style={{ width: 150 }}
-          onChange={setSelectedRsvpStatus}
-          allowClear
-        >
-          <Option value="accepted">Accepted</Option>
-          <Option value="rejected">Rejected</Option>
-          <Option value="pending">Pending</Option>
-          <Option value="partial">Partial</Option>
-        </Select>
+          <Popover
+            content={mobileFilterContent}
+            title="Filters"
+            trigger="click"
+            open={mobileFilterVisible}
+            onOpenChange={setMobileFilterVisible}
+          >
+            <Button icon={<FilterOutlined />} />
+          </Popover>
+        </Space>
       </div>
 
       <Tabs
@@ -1041,6 +1298,17 @@ const GuestManager = () => {
         onOk={() => setDetailModalVisible(false)}
         onCancel={() => setDetailModalVisible(false)}
         footer={[
+          <Button
+            key="delete"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              handleDeleteGuest(selectedGuest.id);
+              setDetailModalVisible(false);
+            }}
+          >
+            Delete Guest
+          </Button>,
           <Button key="back" onClick={() => setDetailModalVisible(false)}>
             Close
           </Button>,
@@ -1225,6 +1493,23 @@ const GuestManager = () => {
             </div>
           </div>
         </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title="Confirm Delete"
+        open={deleteConfirmVisible}
+        onOk={handleBulkDelete}
+        onCancel={() => setDeleteConfirmVisible(false)}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+      >
+        <p>
+          Are you sure you want to delete {selectedRowKeys.length} selected
+          guest{selectedRowKeys.length !== 1 ? "s" : ""}? This action cannot be
+          undone.
+        </p>
       </Modal>
     </div>
   );

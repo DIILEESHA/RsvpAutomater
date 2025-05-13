@@ -1,7 +1,6 @@
 /* src/App.css */
 .site-layout-content {
-  /* padding: 24px; */
-  background: #fff;
+  padding: 24px;
 }
 
 @font-face {
@@ -28,8 +27,19 @@
   align-items: center;
 }
 
+.bultiya {
+  display: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .samiya {
+    display: none;
+  }
+
+  .bultiya{
+    display: flex;
+  }
   .ant-layout-content {
     padding: 0 16px;
   }

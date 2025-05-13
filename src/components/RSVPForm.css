@@ -8,7 +8,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
   padding: 2rem;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 .rsvp-card {
@@ -38,7 +38,7 @@
 }
 
 .rsvp-title::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -81,7 +81,7 @@
 }
 
 .event-title::before {
-  content: '🎉';
+  content: "🎉";
   margin-right: 10px;
   font-size: 1.2rem;
 }
@@ -93,18 +93,20 @@
   font-weight: 500;
 }
 
-.ant-input, .ant-input-number, .ant-input-textarea {
+.ant-input,
+.ant-input-number,
+.ant-input-textarea {
   border-radius: 8px !important;
   padding: 10px 15px !important;
   border: 1px solid #e0e0e0 !important;
   transition: all 0.3s ease !important;
 }
 
-.ant-input:focus, 
-.ant-input-number:focus, 
+.ant-input:focus,
+.ant-input-number:focus,
 .ant-input-textarea:focus,
-.ant-input:hover, 
-.ant-input-number:hover, 
+.ant-input:hover,
+.ant-input-number:hover,
 .ant-input-textarea:hover {
   border-color: #e67e22 !important;
   box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2) !important;
@@ -147,7 +149,7 @@
 .ant-btn-primary {
   background: linear-gradient(90deg, #e67e22, #e74c3c) !important;
   border: none !important;
-  height: 48px !important;
+  height: 32px !important;
   font-size: 1rem !important;
   font-weight: 500 !important;
   border-radius: 8px !important;
@@ -175,7 +177,7 @@
 }
 
 .extra-title::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -190,12 +192,12 @@
   .rsvp-container {
     padding: 1rem;
   }
-  
+
   .rsvp-card {
     border-radius: 12px;
     padding: 10px;
   }
-  
+
   .rsvp-radio-group {
     flex-direction: column;
     gap: 0.5rem;
@@ -204,8 +206,14 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .rsvp-card {
