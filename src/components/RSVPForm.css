@@ -8,6 +8,12 @@
   background: linear-gradient(135deg, #a6c0fe, #f68084);
 }
 
+.rsvp-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .rsvp-card {
   width: 100%;
   max-width: 800px;
@@ -17,7 +23,6 @@
   background-color: #fff;
   border: none;
 }
-
 
 .rsvp-card .ant-card-head {
   background-color: #f4f6f9;
@@ -92,7 +97,7 @@
     padding: 20px;
   }
 
-  .rsvp-card p{
+  .rsvp-card p {
     width: 100%;
   }
 

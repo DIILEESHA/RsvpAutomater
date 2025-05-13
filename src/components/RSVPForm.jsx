@@ -49,7 +49,10 @@ const RSVPForm = () => {
         const docSnap = querySnapshot.docs[0];
         const guestData = docSnap.data();
 
-        if (!guestData.invitedEvents || !Array.isArray(guestData.invitedEvents)) {
+        if (
+          !guestData.invitedEvents ||
+          !Array.isArray(guestData.invitedEvents)
+        ) {
           setError("This guest has no events assigned");
           return;
         }
@@ -95,14 +98,13 @@ const RSVPForm = () => {
     if (!guest) return;
     setSubmitting(true);
     try {
-    const updateData = {
-  rsvpStatus: values.events || {},
-  additionalGuests: values.additionalGuests || {},
-  dietaryPreferences: values.dietaryPreferences || "",
-  specialRequirements: values.specialRequirements || "",
-  lastUpdated: new Date().toISOString(),
-};
-
+      const updateData = {
+        rsvpStatus: values.events || {},
+        additionalGuests: values.additionalGuests || {},
+        dietaryPreferences: values.dietaryPreferences || "",
+        specialRequirements: values.specialRequirements || "",
+        lastUpdated: new Date().toISOString(),
+      };
 
       await updateDoc(doc(db, "guests", guest.id), updateData);
       message.success("Thank you for your RSVP!");
@@ -132,8 +134,12 @@ const RSVPForm = () => {
   return (
     <div className="rsvp-container">
       <Card className="rsvp-card">
-        <Title level={3} className="rsvp-title">Hi {guest?.name}!</Title>
-        <p className="rsvp-subtext">Please let us know if you'll be attending our wedding events:</p>
+        <Title level={3} className="rsvp-title">
+          Hi {guest?.name}!
+        </Title>
+        <p className="rsvp-subtext">
+          Please let us know if you'll be attending our wedding events:
+        </p>
 
         <Form form={form} onFinish={onFinish} layout="vertical">
           {guest?.invitedEvents?.map((event) => (
@@ -153,26 +159,29 @@ const RSVPForm = () => {
                 </Radio.Group>
               </Form.Item>
 
-            <Form.Item shouldUpdate>
-  {() => {
-    const attendance = form.getFieldValue(["events", event]);
-    return attendance === "accepted" ? (
-      <Form.Item
-        name={["additionalGuests", event]}
-        label="Number of additional guests"
-        initialValue={0} // Default value is 0
-      >
-        <Input type="number" placeholder="Enter number of guests" />
-      </Form.Item>
-    ) : null;
-  }}
-</Form.Item>
-
-
+              <Form.Item shouldUpdate>
+                {() => {
+                  const attendance = form.getFieldValue(["events", event]);
+                  return attendance === "accepted" ? (
+                    <Form.Item
+                      name={["additionalGuests", event]}
+                      label="Number of additional guests"
+                      initialValue={0} // Default value is 0
+                    >
+                      <Input
+                        type="number"
+                        placeholder="Enter number of guests"
+                      />
+                    </Form.Item>
+                  ) : null;
+                }}
+              </Form.Item>
             </div>
           ))}
 
-          <Title level={4} className="extra-title">Extra Info</Title>
+          <Title level={4} className="extra-title">
+            Extra Info
+          </Title>
 
           <Form.Item
             name="dietaryPreferences"
