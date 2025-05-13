@@ -961,13 +961,13 @@ const GuestManager = () => {
                 >
                   Bulk Update ({selectedRowKeys.length})
                 </Button>
-                <Button
+                {/* <Button
                   danger
                   icon={<DeleteOutlined />}
                   onClick={() => setDeleteConfirmVisible(true)}
                 >
                   Delete ({selectedRowKeys.length})
-                </Button>
+                </Button> */}
               </>
             )}
           </div>
