@@ -832,7 +832,7 @@ const GuestManager = () => {
   );
 
   return (
-    <div style={{ padding: "30px" }}>
+    <div className="pl">
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={12} md={6}>
           <Card>

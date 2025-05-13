@@ -31,13 +31,19 @@
   display: none;
 }
 
+.pl {
+  padding: 30px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .samiya {
     display: none;
   }
-
-  .bultiya{
+  .pl {
+    padding: 10px;
+  }
+  .bultiya {
     display: flex;
   }
   .ant-layout-content {
