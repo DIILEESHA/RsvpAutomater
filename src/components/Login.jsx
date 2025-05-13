@@ -16,20 +16,20 @@ const Login = () => {
   const [resetEmail, setResetEmail] = useState("");
   const navigate = useNavigate();
 
-// In your Login.js component
-const onFinish = async (values) => {
-  setLoading(true);
-  try {
-    await signInWithEmailAndPassword(auth, values.email, values.password);
-    message.success('Logged in successfully!');
-    localStorage.setItem('isAuthenticated', 'true'); // Add this line
-    navigate('/dashboard');
-  } catch (error) {
-    message.error('Invalid email or password');
-  } finally {
-    setLoading(false);
-  }
-};
+  // In your Login.js component
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      message.success("Logged in successfully!");
+      localStorage.setItem("isAuthenticated", "true");
+      navigate("/dashboard");
+    } catch (error) {
+      message.error("Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleResetPassword = async () => {
     if (!resetEmail) {
