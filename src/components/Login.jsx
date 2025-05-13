@@ -4,7 +4,7 @@ import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/aut
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { MailOutlined } from '@ant-design/icons';
-import './Login.css'; // Import external CSS for custom styles
+import './login.css'; 
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
