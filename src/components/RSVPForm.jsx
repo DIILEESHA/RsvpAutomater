@@ -20,6 +20,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import "./RSVPForm.css"; // ← Import your custom style
 
 const RSVPForm = () => {
   const { guestId } = useParams();
@@ -56,7 +57,6 @@ const RSVPForm = () => {
           ...guestData,
         });
 
-        // Initialize form values
         const initialValues = {
           events: {},
           additionalGuests: {},
@@ -64,17 +64,12 @@ const RSVPForm = () => {
           specialRequirements: "",
         };
 
-        // Set existing RSVP status if available
         if (guestData.rsvpStatus) {
           initialValues.events = guestData.rsvpStatus;
         }
-
-        // Set additional guests if available
         if (guestData.additionalGuests) {
           initialValues.additionalGuests = guestData.additionalGuests;
         }
-
-        // Set other fields if available
         if (guestData.dietaryPreferences) {
           initialValues.dietaryPreferences = guestData.dietaryPreferences;
         }
@@ -98,7 +93,6 @@ const RSVPForm = () => {
     if (!guest) return;
     setSubmitting(true);
     try {
-      // Prepare the data to be saved
       const updateData = {
         rsvpStatus: values.events || {},
         additionalGuests: values.additionalGuests || {},
@@ -125,16 +119,16 @@ const RSVPForm = () => {
     return (
       <Spin
         tip="Loading RSVP..."
-        style={{ display: "block", margin: "20% auto" }}
+        style={{ display: "block", margin: "20% auto",minHeight:"100vh" }}
       />
     );
   if (error)
     return <Alert message="Error" description={error} type="error" showIcon />;
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: 24 }}>
-      <Card title={`Hi ${guest?.name}!`}>
-        <p style={{ marginBottom: 24 }}>
+    <div className="rsvp-container">
+      <Card className="rsvp-card" title={`Hi ${guest?.name}!`}>
+        <p>
           Please let us know if you'll be attending our wedding events:
         </p>
 

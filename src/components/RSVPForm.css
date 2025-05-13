@@ -1,0 +1,67 @@
+/* RSVPForm.css */
+
+.rsvp-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.rsvp-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.rsvp-card .ant-card-head {
+  background: #fafafa;
+  border-radius: 10px 10px 0 0;
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.rsvp-card .ant-card-body {
+  padding: 24px;
+}
+
+.ant-form-item-label > label {
+  font-weight: 600;
+  color: #555;
+}
+
+.ant-radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.ant-input,
+.ant-input-number,
+.ant-input-textarea {
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 15px;
+}
+
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  padding: 10px 25px;
+  font-size: 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.ant-divider-inner-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #444;
+}

@@ -18,6 +18,7 @@ import {
   notification,
   Popover,
   List,
+  Descriptions,
 } from "antd";
 import {
   UploadOutlined,
@@ -29,6 +30,7 @@ import {
   CloseOutlined,
   QuestionOutlined,
   BellOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import Papa from "papaparse";
 import {
@@ -74,6 +76,8 @@ const GuestManager = () => {
   const [notifications, setNotifications] = useState([]);
   const [notificationVisible, setNotificationVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedGuest, setSelectedGuest] = useState(null);
 
   const audio = new Audio(notificationSound);
 
@@ -81,7 +85,7 @@ const GuestManager = () => {
     setBaseUrl(
       window.location.host.includes("localhost")
         ? `${window.location.protocol}//${window.location.host}/rsvp`
-        : "https://yourwedding.com/rsvp"
+        : "https://rsvp-automater.vercel.app/rsvp"
     );
 
     const unsubscribe = onSnapshot(collection(db, "guests"), (snapshot) => {
@@ -129,6 +133,11 @@ const GuestManager = () => {
       rsvpUnsubscribe();
     };
   }, []);
+
+  const showGuestDetails = (guest) => {
+    setSelectedGuest(guest);
+    setDetailModalVisible(true);
+  };
 
   const handleUpload = async (info) => {
     const { file } = info;
@@ -376,7 +385,14 @@ const GuestManager = () => {
       rejectedCount: counts.rejected,
       partialCount: counts.partial,
     };
-  }, [guests, searchText, selectedEvents, selectedSide, selectedRsvpStatus, activeTab]);
+  }, [
+    guests,
+    searchText,
+    selectedEvents,
+    selectedSide,
+    selectedRsvpStatus,
+    activeTab,
+  ]);
 
   const renderRsvpStatus = (rsvpStatus, invitedEvents) => {
     if (!rsvpStatus || Object.keys(rsvpStatus).length === 0) {
@@ -512,9 +528,15 @@ const GuestManager = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 200,
+      width: 220,
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <Tooltip title="View Full Details">
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => showGuestDetails(record)}
+            />
+          </Tooltip>
           <Tooltip title="Send WhatsApp Invite">
             <Button
               icon={<WhatsAppOutlined />}
@@ -536,8 +558,6 @@ const GuestManager = () => {
               disabled={!record.invitedEvents?.length || !record.uniqueLink}
             />
           </Tooltip>
-
-          {/* //add these to view rsvpdetais */}
         </div>
       ),
     },
@@ -762,6 +782,7 @@ const GuestManager = () => {
         bordered
       />
 
+      {/* Add Guest Modal */}
       <Modal
         title="Add New Guest"
         open={isModalVisible}
@@ -843,6 +864,125 @@ const GuestManager = () => {
             </Select>
           </div>
         </div>
+      </Modal>
+
+      {/* Guest Details Modal */}
+      <Modal
+        title="Guest Details"
+        open={detailModalVisible}
+        onOk={() => setDetailModalVisible(false)}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={[
+          <Button key="back" onClick={() => setDetailModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
+        width={800}
+      >
+        {selectedGuest && (
+          <Descriptions bordered column={2}>
+            <Descriptions.Item label="Name">
+              {selectedGuest.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Side">
+              <Tag color={selectedGuest.side === "bride" ? "magenta" : "blue"}>
+                {selectedGuest.side === "bride" ? "Bride" : "Groom"}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="Phone">
+              {selectedGuest.phone}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedGuest.email || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="RSVP Link">
+              {selectedGuest.uniqueLink ? (
+                <a
+                  href={`${baseUrl}/${selectedGuest.uniqueLink}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {`${baseUrl}/${selectedGuest.uniqueLink}`}
+                </a>
+              ) : (
+                "Not generated"
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label="Overall Status">
+              {renderRsvpStatus(
+                selectedGuest.rsvpStatus,
+                selectedGuest.invitedEvents
+              )}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Invited Events" span={2}>
+              {selectedGuest.invitedEvents?.length > 0 ? (
+                <div>
+                  {selectedGuest.invitedEvents.map((event) => (
+                    <Tag key={event} style={{ marginBottom: 4 }}>
+                      {event.charAt(0).toUpperCase() + event.slice(1)}
+                    </Tag>
+                  ))}
+                </div>
+              ) : (
+                "No events assigned"
+              )}
+            </Descriptions.Item>
+
+            {selectedGuest.rsvpStatus &&
+              Object.keys(selectedGuest.rsvpStatus).length > 0 && (
+                <Descriptions.Item label="RSVP Details" span={2}>
+                  <div style={{ marginTop: 8 }}>
+                    {selectedGuest.invitedEvents?.map((event) => (
+                      <div key={event} style={{ marginBottom: 8 }}>
+                        <strong>
+                          {event.charAt(0).toUpperCase() + event.slice(1)}:
+                        </strong>
+                        <div style={{ marginLeft: 16 }}>
+                          <div>
+                            Status:{" "}
+                            {selectedGuest.rsvpStatus[event] === "accepted" ? (
+                              <Tag icon={<CheckOutlined />} color="green">
+                                Accepted
+                              </Tag>
+                            ) : (
+                              <Tag icon={<CloseOutlined />} color="red">
+                                Rejected
+                              </Tag>
+                            )}
+                          </div>
+                          {selectedGuest.additionalGuests?.[event] > 0 && (
+                            <div>
+                              Additional Guests:{" "}
+                              {selectedGuest.additionalGuests[event]}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Descriptions.Item>
+              )}
+
+            {selectedGuest.dietaryPreferences && (
+              <Descriptions.Item label="Dietary Preferences">
+                {selectedGuest.dietaryPreferences}
+              </Descriptions.Item>
+            )}
+
+            {selectedGuest.specialRequirements && (
+              <Descriptions.Item label="Special Requirements">
+                {selectedGuest.specialRequirements}
+              </Descriptions.Item>
+            )}
+
+            <Descriptions.Item label="Last Updated">
+              {selectedGuest.lastUpdated
+                ? new Date(selectedGuest.lastUpdated).toLocaleString()
+                : "Never updated"}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
       </Modal>
     </div>
   );
