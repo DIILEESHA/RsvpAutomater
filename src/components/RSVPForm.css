@@ -1,126 +1,242 @@
 /* RSVPForm.css */
+
+/* Base Styles */
 .rsvp-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #a6c0fe, #f68084);
-}
-
-.rsvp-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  padding: 2rem;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
 .rsvp-card {
   width: 100%;
-  max-width: 800px;
-  border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  background-color: #fff;
+  max-width: 600px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   border: none;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: white;
 }
 
-.rsvp-card .ant-card-head {
-  background-color: #f4f6f9;
-  border-bottom: 1px solid #e6e6e6;
-  border-radius: 20px 20px 0 0;
-  font-family: "silk";
+.rsvp-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
 }
 
-.rsvp-card .ant-card-head-title {
-  font-size: 28px;
-
-  font-weight: 700;
+.rsvp-title {
+  text-align: center;
   color: #2c3e50;
+  margin-bottom: 1rem !important;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-bottom: 1rem;
 }
 
-.rsvp-card p {
-  font-size: 18px;
-  margin-bottom: 30px;
+.rsvp-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #e67e22, #e74c3c);
+  border-radius: 3px;
+}
+
+.rsvp-subtext {
+  text-align: center;
   color: #7f8c8d;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
-.ant-divider {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.ant-form-item-label > label {
-  font-weight: 500;
-  color: #34495e;
-}
-
-.ant-radio-wrapper {
-  font-size: 16px;
-  color: #34495e;
-}
-
-.ant-input,
-.ant-input-number,
-.ant-input-textarea {
-  border-radius: 8px;
-  font-size: 16px;
-  border: 1px solid #dcdcdc;
-  transition: all 0.3s ease-in-out;
-}
-
-.ant-input:focus,
-.ant-input-number:focus,
-.ant-input-textarea:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
-}
-
-.ant-btn-primary {
-  background: linear-gradient(135deg, #3498db, #2ecc71);
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  padding: 12px 28px;
-  font-weight: 600;
-  transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.ant-btn-primary:hover,
-.ant-btn-primary:focus {
-  background: linear-gradient(135deg, #2ecc71, #3498db);
-  transform: scale(1.05);
-}
-
-@media (max-width: 768px) {
-  .rsvp-card {
-    /* padding: 25px; */
-    padding: 20px;
-  }
-
-  .rsvp-card p {
-    width: 100%;
-  }
-
-  .rsvp-card .ant-card-head-title {
-    font-size: 22px;
-  }
-
-  .rsvp-container {
-    padding: 40px 16px;
-  }
-}
-
+/* Event Section Styling */
 .rsvp-event {
-  margin-bottom: 30px;
+  background: rgba(245, 245, 245, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #e67e22;
+  transition: all 0.3s ease;
+}
+
+.rsvp-event:hover {
+  background: rgba(245, 245, 245, 0.8);
+  transform: translateX(5px);
 }
 
 .event-title {
-  color: #2980b9;
-  font-size: 22px;
+  color: #34495e !important;
+  margin-bottom: 1.5rem !important;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+}
+
+.event-title::before {
+  content: '🎉';
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* Form Elements */
+.ant-form-item-label label {
+  color: #7f8c8d !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.ant-input, .ant-input-number, .ant-input-textarea {
+  border-radius: 8px !important;
+  padding: 10px 15px !important;
+  border: 1px solid #e0e0e0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-input:focus, 
+.ant-input-number:focus, 
+.ant-input-textarea:focus,
+.ant-input:hover, 
+.ant-input-number:hover, 
+.ant-input-textarea:hover {
+  border-color: #e67e22 !important;
+  box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2) !important;
+}
+
+.ant-input-textarea {
+  min-height: 100px !important;
+}
+
+/* Radio Buttons */
+.rsvp-radio-group {
+  display: flex !important;
+  gap: 1rem;
+}
+
+.ant-radio-wrapper {
+  display: flex !important;
+  align-items: center;
+}
+
+.ant-radio-inner {
+  width: 20px !important;
+  height: 20px !important;
+  border-color: #bdc3c7 !important;
+}
+
+.ant-radio-checked .ant-radio-inner {
+  border-color: #e67e22 !important;
+}
+
+.ant-radio-inner::after {
+  background-color: #e67e22;
+  width: 12px !important;
+  height: 12px !important;
+  top: 3px !important;
+  left: 3px !important;
+}
+
+/* Submit Button */
+.ant-btn-primary {
+  background: linear-gradient(90deg, #e67e22, #e74c3c) !important;
+  border: none !important;
+  height: 48px !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ant-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(230, 76, 60, 0.3) !important;
+}
+
+.ant-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Extra Info Section */
+.extra-title {
+  color: #34495e !important;
+  margin: 2rem 0 1.5rem 0 !important;
+  font-weight: 400;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.extra-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #e67e22, #e74c3c);
+  border-radius: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .rsvp-container {
+    padding: 1rem;
+  }
+  
+  .rsvp-card {
+    border-radius: 12px;
+    padding: 10px;
+  }
+  
+  .rsvp-radio-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rsvp-card {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.rsvp-event {
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: 0.2s;
 }
 
 .extra-title {
-  color: #2c3e50;
-  font-size: 20px;
-  margin-top: 30px;
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: 0.4s;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#e67e22, #e74c3c);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e74c3c;
 }
