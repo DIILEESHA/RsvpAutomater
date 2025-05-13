@@ -1,13 +1,10 @@
-// src/components/Login.js
 import { useState } from 'react';
 import { Button, Card, Form, Input, message, Modal } from 'antd';
-import { 
-  signInWithEmailAndPassword, 
-  sendPasswordResetEmail 
-} from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { MailOutlined } from '@ant-design/icons';
+import './Login.css'; // Import external CSS for custom styles
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -49,34 +46,23 @@ const Login = () => {
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      minHeight: '100vh',
-      background: '#f0f2f5'
-    }}>
-      <Card title="Wedding Admin Login" style={{ width: 400 }}>
+    <div className="login-container">
+      <Card className="login-card" title="Wedding Admin Login">
         <Form
           name="login"
           onFinish={onFinish}
           layout="vertical"
+          className="login-form"
         >
           <Form.Item
             label="Email"
             name="email"
             rules={[
-              { 
-                required: true, 
-                message: 'Please input your email!' 
-              },
-              {
-                type: 'email',
-                message: 'Please enter a valid email address',
-              }
+              { required: true, message: 'Please input your email!' },
+              { type: 'email', message: 'Please enter a valid email address' },
             ]}
           >
-            <Input prefix={<MailOutlined />} />
+            <Input prefix={<MailOutlined />} className="login-input" />
           </Form.Item>
 
           <Form.Item
@@ -84,7 +70,7 @@ const Login = () => {
             name="password"
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
-            <Input.Password />
+            <Input.Password className="login-input" />
           </Form.Item>
 
           <Form.Item>
@@ -92,7 +78,7 @@ const Login = () => {
               type="primary" 
               htmlType="submit" 
               loading={loading}
-              style={{ width: '100%' }}
+              className="login-btn"
             >
               Log in
             </Button>
@@ -102,6 +88,7 @@ const Login = () => {
             <Button 
               type="link" 
               onClick={() => setResetModalVisible(true)}
+              className="forgot-password-link"
             >
               Forgot password?
             </Button>
@@ -121,6 +108,7 @@ const Login = () => {
         confirmLoading={resetLoading}
         okText="Send Reset Link"
         cancelText="Cancel"
+        className="reset-password-modal"
       >
         <p>Enter your email address to receive a password reset link:</p>
         <Input

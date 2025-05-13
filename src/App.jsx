@@ -19,7 +19,7 @@ function AppLayout() {
   const location = useLocation();
 
   // Check if the current route matches /rsvp/:guestId
-  const isRSVPPage = location.pathname.startsWith("/rsvp");
+  const isRSVPPage = location.pathname.startsWith("/");
 
   return (
     <Layout className="layout">
