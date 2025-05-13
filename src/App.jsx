@@ -34,23 +34,18 @@ function AppLayout() {
 
   return (
     <Layout className="layout">
-      {!isRSVPPage && (
-
-        <>
-        </>
-     
-      )}
+      {!isRSVPPage && <></>}
       <Content style={{ padding: "0 0px" }}>
         <div className="site-layout-content">
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <GuestManager />
                 </ProtectedRoute>
-              } 
+              }
             />
             <Route path="/rsvp/:guestId" element={<RSVPForm />} />
             <Route path="/thank-you" element={<ThankYouPage />} />

@@ -89,6 +89,7 @@ const Login = () => {
               type="link" 
               onClick={() => setResetModalVisible(true)}
               className="forgot-password-link"
+        style={{color:"#000"}}
             >
               Forgot password?
             </Button>
@@ -98,6 +99,7 @@ const Login = () => {
 
       {/* Password Reset Modal */}
       <Modal
+
         title="Reset Password"
         visible={resetModalVisible}
         onOk={handleResetPassword}
