@@ -35,9 +35,10 @@ function AppLayout() {
   return (
     <Layout className="layout">
       {!isRSVPPage && (
-        <Header>
-          {/* <h3 style={{background:""}} className="logo">Wedding RSVP</h3> */}
-        </Header>
+
+        <>
+        </>
+     
       )}
       <Content style={{ padding: "0 0px" }}>
         <div className="site-layout-content">
