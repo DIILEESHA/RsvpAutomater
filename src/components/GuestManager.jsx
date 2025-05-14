@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   Button,
@@ -11,7 +11,7 @@ import {
   Statistic,
   Tooltip,
   Input,
-   Avatar,
+  Avatar,
   Row,
   Col,
   Tag,
@@ -26,6 +26,7 @@ import {
   Menu,
   Space,
   Divider,
+  InputNumber,
 } from "antd";
 import {
   UploadOutlined,
@@ -45,7 +46,8 @@ import {
   DeleteOutlined,
   MoreOutlined,
   FilterOutlined,
-   UserOutlined, LogoutOutlined,
+  UserOutlined,
+  LogoutOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import Papa from "papaparse";
@@ -70,7 +72,7 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 
 const GuestManager = () => {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [guests, setGuests] = useState([]);
   const [events] = useState([
     "sangeet",
@@ -86,6 +88,7 @@ const GuestManager = () => {
     email: "",
     side: "groom",
     invitedEvents: [],
+    eventGuests: {}, // New field for event-specific guest counts
   });
   const [baseUrl, setBaseUrl] = useState("");
   const [searchText, setSearchText] = useState("");
@@ -165,13 +168,12 @@ const GuestManager = () => {
     };
   }, []);
 
-
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -241,6 +243,14 @@ const GuestManager = () => {
           }
         }
 
+        // Parse event guests from CSV
+        const eventGuests = {};
+        events.forEach((event) => {
+          if (guest[`${event}_guests`]) {
+            eventGuests[event] = parseInt(guest[`${event}_guests`]) || 1;
+          }
+        });
+
         if (!guest.name || !guest.phone) {
           throw new Error("Name and phone are required fields");
         }
@@ -249,6 +259,7 @@ const GuestManager = () => {
           ...guest,
           key: nanoid(),
           invitedEvents,
+          eventGuests,
           side: guest.side || "groom",
           email: guest.email || "",
           rsvpStatus: guest.rsvpStatus || {},
@@ -275,6 +286,21 @@ const GuestManager = () => {
     );
   };
 
+  const handleEventGuestChange = (event, value, record) => {
+    setGuests(
+      guests.map((g) => {
+        if (g.key === record.key) {
+          const updatedEventGuests = {
+            ...g.eventGuests,
+            [event]: value,
+          };
+          return { ...g, eventGuests: updatedEventGuests };
+        }
+        return g;
+      })
+    );
+  };
+
   const saveGuests = async () => {
     try {
       await Promise.all(
@@ -292,6 +318,7 @@ const GuestManager = () => {
               invitationSent: false,
               rsvpStatus: guest.rsvpStatus || {},
               additionalGuests: guest.additionalGuests || {},
+              eventGuests: guest.eventGuests || {},
               lastUpdated: new Date(),
             });
           }
@@ -325,8 +352,16 @@ const GuestManager = () => {
 
     try {
       const uniqueLink = nanoid(8);
+
+      // Initialize eventGuests with default values for selected events
+      const eventGuests = {};
+      newGuest.invitedEvents.forEach((event) => {
+        eventGuests[event] = newGuest.eventGuests[event] || 1;
+      });
+
       await setDoc(doc(db, "guests", uniqueLink), {
         ...newGuest,
+        eventGuests,
         uniqueLink,
         invitationSent: false,
         rsvpStatus: {},
@@ -342,6 +377,7 @@ const GuestManager = () => {
         email: "",
         side: "groom",
         invitedEvents: [],
+        eventGuests: {},
       });
     } catch (error) {
       message.error("Error adding guest");
@@ -605,6 +641,7 @@ const GuestManager = () => {
         rsvpStatus[`${event}_status`] = guest.rsvpStatus?.[event] || "pending";
         rsvpStatus[`${event}_additional`] =
           guest.additionalGuests?.[event] || 0;
+        rsvpStatus[`${event}_allowed`] = guest.eventGuests?.[event] || 1;
       });
 
       return {
@@ -635,11 +672,7 @@ const GuestManager = () => {
   };
   const menu = (
     <Menu>
-      <Menu.Item 
-        key="logout" 
-        icon={<LogoutOutlined />} 
-        onClick={handleLogout}
-      >
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
         Logout
       </Menu.Item>
     </Menu>
@@ -743,19 +776,35 @@ const GuestManager = () => {
       dataIndex: "invitedEvents",
       key: "events",
       render: (events, record) => (
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          value={events || []}
-          onChange={(value) => handleEventChange(value, record)}
-          placeholder="Select events"
-        >
+        <div>
+          <Select
+            mode="multiple"
+            style={{ width: "100%", marginBottom: 8 }}
+            value={events || []}
+            onChange={(value) => handleEventChange(value, record)}
+            placeholder="Select events"
+          >
+            {events?.map((event) => (
+              <Option key={event} value={event}>
+                {event.charAt(0).toUpperCase() + event.slice(1)}
+              </Option>
+            ))}
+          </Select>
           {events?.map((event) => (
-            <Option key={event} value={event}>
-              {event.charAt(0).toUpperCase() + event.slice(1)}
-            </Option>
+            <div key={event} style={{ marginBottom: 4 }}>
+              <span style={{ marginRight: 8 }}>{event}:</span>
+              <InputNumber
+                min={1}
+                max={10}
+                value={record.eventGuests?.[event] || 1}
+                onChange={(value) =>
+                  handleEventGuestChange(event, value, record)
+                }
+                style={{ width: 60 }}
+              />
+            </div>
           ))}
-        </Select>
+        </div>
       ),
     },
     {
@@ -774,6 +823,8 @@ const GuestManager = () => {
                   {status === "accepted" ? " ✅" : " ❌"}
                   {record.additionalGuests?.[event] > 0 &&
                     ` (+${record.additionalGuests[event]})`}
+                  {record.eventGuests?.[event] > 1 &&
+                    ` (allowed: ${record.eventGuests[event]})`}
                 </div>
               ))}
             </div>
@@ -857,36 +908,31 @@ const GuestManager = () => {
 
   return (
     <div className="pl">
-
-
-
       <div>
-      <div style={{ 
-        textAlign: 'right', 
-        padding: '10px',
-        display: 'flex',
-        justifyContent: 'flex-end',
-        alignItems: 'center'
-      }}>
-        <Dropdown 
-          overlay={menu} 
-          trigger={['click']}
-          placement="bottomRight"
+        <div
+          style={{
+            textAlign: "right",
+            padding: "10px",
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
         >
-          <Avatar 
-            size="large" 
-            icon={<UserOutlined />} 
-            style={{ 
-              backgroundColor: '#1890ff',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-            }}
-            className="profile-avatar"
-          />
-        </Dropdown>
+          <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
+            <Avatar
+              size="large"
+              icon={<UserOutlined />}
+              style={{
+                backgroundColor: "#1890ff",
+                cursor: "pointer",
+                transition: "all 0.3s",
+              }}
+              className="profile-avatar"
+            />
+          </Dropdown>
+        </div>
       </div>
-      {/* Rest of your GuestManager content */}
-    </div>
+
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={12} md={6}>
           <Card>
@@ -929,9 +975,8 @@ const GuestManager = () => {
         </Col>
       </Row>
 
-      {/* Desktop Action Buttons */}
       <div
-      className="samiya"
+        className="samiya"
         style={{
           marginBottom: "20px",
           display: { xs: "none", sm: "flex" },
@@ -1015,13 +1060,6 @@ const GuestManager = () => {
                 >
                   Bulk Update ({selectedRowKeys.length})
                 </Button>
-                {/* <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => setDeleteConfirmVisible(true)}
-                >
-                  Delete ({selectedRowKeys.length})
-                </Button> */}
               </>
             )}
           </div>
@@ -1075,9 +1113,8 @@ const GuestManager = () => {
         </div>
       </div>
 
-      {/* Mobile Action Buttons */}
       <div
-      className="bultiya"
+        className="bultiya"
         style={{
           marginBottom: "20px",
           display: { xs: "flex", sm: "none" },
@@ -1111,7 +1148,9 @@ const GuestManager = () => {
                     label: "Import CSV",
                     icon: <UploadOutlined />,
                     onClick: () =>
-                      document.querySelector('.mobile-upload input[type="file"]').click(),
+                      document
+                        .querySelector('.mobile-upload input[type="file"]')
+                        .click(),
                   },
                   {
                     key: "2",
@@ -1342,6 +1381,34 @@ const GuestManager = () => {
               ))}
             </Select>
           </div>
+
+          <div>
+            <label>Guest Counts</label>
+            {newGuest.invitedEvents.map((event) => (
+              <div key={event} style={{ marginBottom: 8 }}>
+                <span style={{ marginRight: 8 }}>{event}:</span>
+                <InputNumber
+                  min={1}
+                  max={10}
+                  value={newGuest.eventGuests[event] || 1}
+                  onChange={(value) => {
+                    setNewGuest((prev) => ({
+                      ...prev,
+                      eventGuests: {
+                        ...prev.eventGuests,
+                        [event]: value,
+                      },
+                    }));
+                  }}
+                />
+                <span style={{ marginLeft: 8 }}>
+                  (Total: {newGuest.eventGuests[event] || 1} - You +{" "}
+                  {Math.max(0, (newGuest.eventGuests[event] || 1) - 1)}{" "}
+                  additional)
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </Modal>
 
@@ -1409,9 +1476,15 @@ const GuestManager = () => {
               {selectedGuest.invitedEvents?.length > 0 ? (
                 <div>
                   {selectedGuest.invitedEvents.map((event) => (
-                    <Tag key={event} style={{ marginBottom: 4 }}>
-                      {event.charAt(0).toUpperCase() + event.slice(1)}
-                    </Tag>
+                    <div key={event} style={{ marginBottom: 8 }}>
+                      <Tag style={{ marginBottom: 4 }}>
+                        {event.charAt(0).toUpperCase() + event.slice(1)}
+                      </Tag>
+                      <span style={{ marginLeft: 8 }}>
+                        Allowed guests:{" "}
+                        {selectedGuest.eventGuests?.[event] || 1}
+                      </span>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -1440,6 +1513,10 @@ const GuestManager = () => {
                                 Rejected
                               </Tag>
                             )}
+                          </div>
+                          <div>
+                            Allowed Guests:{" "}
+                            {selectedGuest.eventGuests?.[event] || 1}
                           </div>
                           {selectedGuest.additionalGuests?.[event] > 0 && (
                             <div>

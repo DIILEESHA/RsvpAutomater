@@ -9,6 +9,8 @@ import {
   Spin,
   Alert,
   Typography,
+  InputNumber,
+  Tag,
 } from "antd";
 import { useParams } from "react-router-dom";
 import {
@@ -49,10 +51,7 @@ const RSVPForm = () => {
         const docSnap = querySnapshot.docs[0];
         const guestData = docSnap.data();
 
-        if (
-          !guestData.invitedEvents ||
-          !Array.isArray(guestData.invitedEvents)
-        ) {
+        if (!guestData.invitedEvents || !Array.isArray(guestData.invitedEvents)) {
           setError("This guest has no events assigned");
           return;
         }
@@ -65,22 +64,15 @@ const RSVPForm = () => {
         const initialValues = {
           events: {},
           additionalGuests: {},
-          dietaryPreferences: "",
-          specialRequirements: "",
+          dietaryPreferences: guestData.dietaryPreferences || "",
+          specialRequirements: guestData.specialRequirements || "",
         };
 
-        if (guestData.rsvpStatus) {
-          initialValues.events = guestData.rsvpStatus;
-        }
-        if (guestData.additionalGuests) {
-          initialValues.additionalGuests = guestData.additionalGuests;
-        }
-        if (guestData.dietaryPreferences) {
-          initialValues.dietaryPreferences = guestData.dietaryPreferences;
-        }
-        if (guestData.specialRequirements) {
-          initialValues.specialRequirements = guestData.specialRequirements;
-        }
+        // Initialize with existing values or 0
+        guestData.invitedEvents.forEach(event => {
+          initialValues.events[event] = guestData.rsvpStatus?.[event] || "pending";
+          initialValues.additionalGuests[event] = guestData.additionalGuests?.[event] || 0;
+        });
 
         form.setFieldsValue(initialValues);
       } catch (err) {
@@ -98,9 +90,16 @@ const RSVPForm = () => {
     if (!guest) return;
     setSubmitting(true);
     try {
+      // Clean up additional guests - set to 0 if not attending
+      const cleanedAdditionalGuests = {};
+      Object.keys(values.additionalGuests).forEach(event => {
+        cleanedAdditionalGuests[event] = 
+          values.events[event] === "accepted" ? (values.additionalGuests[event] || 0) : 0;
+      });
+
       const updateData = {
         rsvpStatus: values.events || {},
-        additionalGuests: values.additionalGuests || {},
+        additionalGuests: cleanedAdditionalGuests,
         dietaryPreferences: values.dietaryPreferences || "",
         specialRequirements: values.specialRequirements || "",
         lastUpdated: new Date().toISOString(),
@@ -142,42 +141,70 @@ const RSVPForm = () => {
         </p>
 
         <Form form={form} onFinish={onFinish} layout="vertical">
-          {guest?.invitedEvents?.map((event) => (
-            <div key={event} className="rsvp-event">
-              <Title level={4} className="event-title">
-                {event.charAt(0).toUpperCase() + event.slice(1)}
-              </Title>
+          {guest?.invitedEvents?.map((event) => {
+            const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
+            return (
+              <div key={event} className="rsvp-event">
+                <Title level={4} className="event-title">
+                  {event.charAt(0).toUpperCase() + event.slice(1)}
+                </Title>
+                
+                {maxAdditional > 0 ? (
+                  <p className="event-guest-info">
+                    You can bring up to {maxAdditional} additional guest{maxAdditional !== 1 ? 's' : ''}
+                  </p>
+                ) : (
+                  <Tag color="orange" style={{ marginBottom: 8 }}>
+                    No additional guests allowed for this event
+                  </Tag>
+                )}
 
-              <Form.Item
-                name={["events", event]}
-                label="Will you attend?"
-                rules={[{ required: true, message: "Please select an option" }]}
-              >
-                <Radio.Group className="rsvp-radio-group">
-                  <Radio value="accepted">Yes, I'll be there</Radio>
-                  <Radio value="rejected">No, I can't make it</Radio>
-                </Radio.Group>
-              </Form.Item>
+                <Form.Item
+                  name={["events", event]}
+                  label="Will you attend?"
+                  rules={[{ required: true, message: "Please select an option" }]}
+                >
+                  <Radio.Group className="rsvp-radio-group">
+                    <Radio value="accepted">Yes, I'll be there</Radio>
+                    <Radio value="rejected">No, I can't make it</Radio>
+                  </Radio.Group>
+                </Form.Item>
 
-              <Form.Item shouldUpdate>
-                {() => {
-                  const attendance = form.getFieldValue(["events", event]);
-                  return attendance === "accepted" ? (
-                    <Form.Item
-                      name={["additionalGuests", event]}
-                      label="Number of additional guests"
-                      initialValue={0} // Default value is 0
-                    >
-                      <Input
-                        type="number"
-                        placeholder="Enter number of guests"
-                      />
-                    </Form.Item>
-                  ) : null;
-                }}
-              </Form.Item>
-            </div>
-          ))}
+                <Form.Item shouldUpdate>
+                  {() => {
+                    const attendance = form.getFieldValue(["events", event]);
+                    return attendance === "accepted" && maxAdditional > 0 ? (
+                      <Form.Item
+                        name={["additionalGuests", event]}
+                        label="Number of additional guests"
+                        initialValue={0}
+                        rules={[
+                          {
+                            validator: (_, value) => {
+                              if (value > maxAdditional) {
+                                return Promise.reject(`Maximum ${maxAdditional} additional guest${maxAdditional !== 1 ? 's' : ''} allowed`);
+                              }
+                              if (value < 0) {
+                                return Promise.reject("Cannot be negative");
+                              }
+                              return Promise.resolve();
+                            }
+                          }
+                        ]}
+                      >
+                        <InputNumber
+                          min={0}
+                          max={maxAdditional}
+                          placeholder="0"
+                          style={{ width: '100%' }}
+                        />
+                      </Form.Item>
+                    ) : null;
+                  }}
+                </Form.Item>
+              </div>
+            );
+          })}
 
           <Title level={4} className="extra-title">
             Extra Info
