@@ -15,6 +15,13 @@
   font-weight: normal;
   font-style: normal;
 }
+
+@font-face {
+  font-family: "sm";
+  src: url("./assets/SM.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
 @font-face {
   font-family: "hel";
   src: url("./assets/hel.ttf") format("opentype");
@@ -46,6 +53,16 @@
   padding: 30px;
 }
 
+.footer {
+  background-color: #000;
+  color: #fff;
+  padding: 15px;
+  font-family: "hel";
+  text-align: center;
+  font-size: 15px;
+  text-transform: uppercase;
+}
+
 .rsvpt {
   /* display: none; */
   font-size: 18px;
@@ -73,7 +90,7 @@
     display: flex;
   }
   .ant-layout-content {
-    padding: 0 0px;
+    padding: 0 10px;
   }
   .ant-card .ant-card-body {
     padding: 10px;

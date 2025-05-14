@@ -16,6 +16,7 @@ import "./App.css";
 import ThankYouPage from "./components/ThankYouPage";
 import { auth } from "./firebase";
 import Home from "./pages/home/Home";
+import Nav from "./components/nav/Nav";
 
 const { Header, Content } = Layout;
 
@@ -38,7 +39,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
   return children;
 };
@@ -52,8 +53,9 @@ function AppLayout() {
       {!isRSVPPage && <></>}
       <Content style={{ padding: "0 0px" }}>
         <div className="site-layout-content">
+          <Nav />
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
             <Route
               path="/dashboard"
@@ -66,6 +68,9 @@ function AppLayout() {
             <Route path="/rsvp/:guestId" element={<RSVPForm />} />
             <Route path="/thank-you" element={<ThankYouPage />} />
           </Routes>
+          <div className="footer">
+            © 2025 Nikhil & Shivani
+          </div>
         </div>
       </Content>
     </Layout>

@@ -1,0 +1,145 @@
+.header_container {
+  position: relative;
+  width: 100%;
+  top: 0px;
+  background-size: cover;
+  height: 130vh;
+  background-position: center 80%;
+  background-image: url("https://i.imgur.com/fiolbQ4.jpeg");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.header_container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+
+.header_content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  margin-top: 150px;
+  padding: 0 20px;
+}
+
+.couple_name {
+  font-weight: 300;
+  line-height: 150%;
+  font-size: 105px;
+  text-transform: uppercase;
+  font-family: "sm" !important;
+  margin-bottom: 20px;
+}
+
+.actual_place {
+  font-family: "hel";
+  font-size: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Media Queries for Responsive Design */
+
+/* For tablets and smaller desktops (1024px and below) */
+@media (max-width: 1024px) {
+  .header_container {
+    height: 110vh;
+  }
+  
+  .couple_name {
+    font-size: 85px;
+  }
+  
+  .actual_place {
+    font-size: 26px;
+  }
+}
+
+/* For large tablets (768px and below) */
+@media (max-width: 768px) {
+  .header_container {
+    height: 80vh;
+    background-position: center 70%;
+  }
+  
+  .header_content {
+    margin-top: 120px;
+  }
+  
+  .couple_name {
+    font-size: 65px;
+    line-height: 130%;
+  }
+  
+  .actual_place {
+    font-size: 22px;
+    letter-spacing: 1px;
+  }
+}
+
+/* For mobile devices (480px and below) */
+@media (max-width: 480px) {
+  .header_container {
+    height: 70vh;
+  }
+  
+  .header_content {
+    margin-top: 100px;
+  }
+  
+  .couple_name {
+    font-size: 48px;
+    line-height: 120%;
+    margin-bottom: 15px;
+  }
+  
+  .actual_place {
+    font-size: 18px;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* For very small mobile devices (360px and below) */
+@media (max-width: 360px) {
+  .header_container {
+    height: 60vh;
+  }
+  
+  .couple_name {
+    font-size: 40px;
+  }
+  
+  .actual_place {
+    font-size: 16px;
+  }
+}
+
+/* Orientation adjustments for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .header_container {
+    height: 150vh;
+  }
+  
+  .header_content {
+    margin-top: 80px;
+  }
+  
+  .couple_name {
+    font-size: 50px;
+  }
+  
+  .actual_place {
+    font-size: 18px;
+  }
+}
