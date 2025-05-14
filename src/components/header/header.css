@@ -39,9 +39,13 @@
   font-size: 105px;
   text-transform: uppercase;
   font-family: "sm" !important;
+   letter-spacing: normal; 
   margin-bottom: 20px;
 }
-
+.name-separator {
+  margin: 0 0.2em; /* Adjust spacing around the & symbol */
+  font-weight: 300; /* Optional: make the & symbol lighter */
+}
 .actual_place {
   font-family: "hel";
   font-size: 30px;
@@ -99,7 +103,7 @@
   }
 
   .couple_name {
-    font-size: 48px;
+    font-size: 38px;
     line-height: 120%;
     margin-bottom: 15px;
   }

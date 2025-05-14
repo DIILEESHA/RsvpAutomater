@@ -77,6 +77,22 @@
   align-items: center;
   justify-content: center;
 }
+.nal {
+  display: none;
+}
+.gal{
+  display: flex;
+}
+
+@media screen and (max-width: 964px) {
+  .gal {
+    display: none;
+  }
+
+  .nal {
+    display: flex;
+  }
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
