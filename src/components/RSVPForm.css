@@ -227,6 +227,14 @@
   padding: 40px 0px;
 }
 
+.rsvp_ttle{
+  font-size: 50px;
+}
+
+.rsvp-subtext{
+  text-align: center!important;
+}
+
   .rsvp-card {
     border-radius: 12px;
     padding: 10px;

@@ -11,8 +11,14 @@ import {
   Typography,
   InputNumber,
   Tag,
+  Image,
+  Divider,
+  Descriptions,
+  Badge,
+  Row,
+  Col,
 } from "antd";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   collection,
   query,
@@ -22,17 +28,161 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import "./RSVPForm.css";
 
 const { Title } = Typography;
 
+// Event data with dates and locations
+const eventDetails = {
+  sangeet: {
+    name: "Sangeet Ceremony",
+    date: "June 15, 2024",
+    time: "6:00 PM",
+    location: "Grand Ballroom, Taj Hotel, Mumbai",
+    description: "An evening of music and dance performances",
+  },
+  mehndi: {
+    name: "Mehndi Celebration",
+    date: "June 16, 2024",
+    time: "2:00 PM",
+    location: "Outdoor Garden, The Leela Palace, Mumbai",
+    description: "Traditional henna application with live music",
+  },
+  haldi: {
+    name: "Haldi Ceremony",
+    date: "June 17, 2024",
+    time: "10:00 AM",
+    location: "Family Residence, Bandra West, Mumbai",
+    description: "Turmeric ceremony with close family and friends",
+  },
+  wedding: {
+    name: "Wedding Ceremony",
+    date: "June 18, 2024",
+    time: "7:00 PM",
+    location: "Sea View Lawn, The Oberoi, Mumbai",
+    description: "Traditional wedding ceremony followed by reception",
+  },
+  reception: {
+    name: "Reception",
+    date: "June 19, 2024",
+    time: "8:00 PM",
+    location: "Grand Ballroom, The St. Regis, Mumbai",
+    description: "Evening celebration with dinner and dancing",
+  },
+};
+
+// PDF Component for Event Details
+const EventDetailsPDF = ({ guest, events }) => (
+  <Document>
+    <Page style={styles.page}>
+      <View style={styles.header}>
+        <Text style={styles.title}> Wedding Celebration Details</Text>
+        <Text style={styles.subtitle}>Honoring our special guest, {guest.name}</Text>
+      </View>
+
+      <View style={styles.line} />
+
+      {events.map((eventKey) => {
+        const event = eventDetails[eventKey];
+        return (
+          <View key={eventKey} style={styles.eventSection}>
+            <Text style={styles.eventName}>{event.name}</Text>
+            <Text style={styles.eventDetail}> Date: {event.date}</Text>
+            <Text style={styles.eventDetail}> Time: {event.time}</Text>
+            <Text style={styles.eventDetail}> Location: {event.location}</Text>
+            {event.description && (
+              <Text style={styles.eventDescription}>{event.description}</Text>
+            )}
+            <View style={styles.divider} />
+          </View>
+        );
+      })}
+
+      <Text style={styles.footer}>We can't wait to celebrate with you! 💐</Text>
+    </Page>
+  </Document>
+);
+
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontFamily: "Helvetica",
+    backgroundColor: "#fff8f0",
+  },
+  header: {
+    marginBottom: 30,
+    textAlign: "center",
+    padding: 10,
+    borderRadius: 10,
+    // backgroundColor: "#fdebd0",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 5,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#5d6d7e",
+  },
+  line: {
+    height: 1,
+    backgroundColor: "#d5d8dc",
+    marginVertical: 20,
+  },
+  eventSection: {
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    borderColor: "#f2f3f4",
+    borderWidth: 1,
+  },
+  eventName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 8,
+  },
+  eventDetail: {
+    fontSize: 14,
+    marginBottom: 4,
+    color: "#2e4053",
+  },
+  eventDescription: {
+    fontSize: 12,
+    marginTop: 10,
+    color: "#7f8c8d",
+    fontStyle: "italic",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#f0f0f0",
+    marginTop: 15,
+  },
+  footer: {
+    marginTop: 40,
+    fontSize: 14,
+    textAlign: "center",
+    color: "#6e2c00",
+    fontStyle: "italic",
+  },
+});
+
+
 const RSVPForm = () => {
   const { guestId } = useParams();
+  const navigate = useNavigate();
   const [guest, setGuest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     const fetchGuest = async () => {
@@ -71,7 +221,6 @@ const RSVPForm = () => {
           specialRequirements: guestData.specialRequirements || "",
         };
 
-        // Initialize with existing values or 0
         guestData.invitedEvents.forEach((event) => {
           initialValues.events[event] =
             guestData.rsvpStatus?.[event] || "pending";
@@ -93,14 +242,17 @@ const RSVPForm = () => {
 
   const onFinish = async (values) => {
     if (!guest) return;
+
     setSubmitting(true);
+
     try {
-      // Clean up additional guests - set to 0 if not attending
+      const additionalGuests = values.additionalGuests || {};
+
       const cleanedAdditionalGuests = {};
-      Object.keys(values.additionalGuests).forEach((event) => {
+      Object.keys(additionalGuests).forEach((event) => {
         cleanedAdditionalGuests[event] =
-          values.events[event] === "accepted"
-            ? values.additionalGuests[event] || 0
+          values.events?.[event] === "accepted"
+            ? additionalGuests[event] || 0
             : 0;
       });
 
@@ -126,39 +278,89 @@ const RSVPForm = () => {
     }
   };
 
-  if (loading)
+  const handleContinue = () => {
+    setShowWelcome(true);
+  };
+
+  if (loading) {
     return (
       <Spin
         tip="Loading RSVP..."
         style={{ display: "block", margin: "20% auto", minHeight: "100vh" }}
       />
     );
+  }
 
-  if (error)
+  if (error) {
     return <Alert message="Error" description={error} type="error" showIcon />;
+  }
+
+  if (showWelcome) {
+    ("");
+  }
 
   return (
     <div className="rsvp-container">
       <Card className="rsvp-card">
         <div className="formier">
-          <h2 className="rsvp_ttle">RSVP</h2>
+          <h2 className="rsvp_ttle">Wedding RSVP</h2>
 
           <Title level={3} className="rsvp-title">
             Hi {guest?.name}!
           </Title>
-          <p className="rsvp-subtext">
-            Please let us know if you'll be attending our wedding events: We
-            can't wait to celebrate our special day with you, and your presence
-            means the world to us!
-          </p>
+
+          <Text style={{textAlign:"center"}} className="rsvp-subtext">
+            We can't wait to celebrate our special day with you! Please let us
+            know if you'll be attending each event.
+          </Text>
+
+          <Divider />
+          <div className="event-details-section">
+            <Title level={4} className="section-title">
+              Your Invited Events
+            </Title>
+          <Divider />
+
+            <Row gutter={[16, 16]}>
+              {guest?.invitedEvents?.map((eventKey) => {
+                const event = eventDetails[eventKey];
+                return (
+                  <Col xs={24} sm={12} key={eventKey}>
+                    <Card className="event-card">
+                      <Badge.Ribbon text={event.name} color="#722ed1">
+                        <div className="event-content">
+                          <Descriptions column={1} size="small">
+                            <Descriptions.Item label="Date">
+                              {event.date}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Time">
+                              {event.time}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Location">
+                              {event.location}
+                            </Descriptions.Item>
+                    
+                          </Descriptions>
+                        </div>
+                      </Badge.Ribbon>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          </div>
+
+          <Divider />
 
           <Form form={form} onFinish={onFinish} layout="vertical">
             {guest?.invitedEvents?.map((event) => {
               const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
+              const eventInfo = eventDetails[event];
+
               return (
                 <div key={event} className="rsvp-event">
                   <Title level={4} className="event-title">
-                    {event.charAt(0).toUpperCase() + event.slice(1)}
+                    {eventInfo.name}
                   </Title>
 
                   {maxAdditional > 0 ? (
@@ -221,12 +423,13 @@ const RSVPForm = () => {
                       ) : null;
                     }}
                   </Form.Item>
+                  <Divider />
                 </div>
               );
             })}
 
             <Title level={4} className="extra-title">
-              Extra Info
+              Additional Information
             </Title>
 
             <Form.Item
@@ -242,7 +445,11 @@ const RSVPForm = () => {
             >
               <Input.TextArea placeholder="e.g., wheelchair access, baby seat, etc." />
             </Form.Item>
-            <div className="hab">
+
+            <div
+              className="hab"
+              style={{ display: "flex", flexDirection: "column" }}
+            >
               <Form.Item>
                 <Button
                   className="habibi"
@@ -256,6 +463,34 @@ const RSVPForm = () => {
                   Submit RSVP
                 </Button>
               </Form.Item>
+
+              {guest?.invitedEvents && (
+                <div className="download-section">
+                  <PDFDownloadLink
+                    document={
+                      <EventDetailsPDF
+                        guest={guest}
+                        events={guest.invitedEvents}
+                      />
+                    }
+                    fileName={`${guest.name}_wedding_details.pdf`}
+                  >
+                    {({ loading }) => (
+                      <Button
+                        style={{ border: "none", textDecoration: "underline" }}
+                        type="default"
+                        size="large"
+                        block
+                        loading={loading}
+                      >
+                        {loading
+                          ? "Preparing PDF..."
+                          : "Download Event Details"}
+                      </Button>
+                    )}
+                  </PDFDownloadLink>
+                </div>
+              )}
             </div>
           </Form>
         </div>
