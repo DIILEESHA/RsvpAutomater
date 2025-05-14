@@ -9,14 +9,17 @@ const Nav = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Handle scroll behavior
+  // Handle scroll behavior for both desktop and mobile
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollPos = window.pageYOffset;
       const isScrollingUp = prevScrollPos > currentScrollPos;
       
+      // Show/hide logic (only hide when scrolling down past 100px)
       setVisible(isScrollingUp || currentScrollPos < 100);
       setPrevScrollPos(currentScrollPos);
+      
+      // Background color logic (show when scrolled past 50px)
       setScrolled(currentScrollPos > 50);
     };
 
@@ -83,7 +86,7 @@ const Nav = () => {
                   key={item.target}
                   className={`nav_li ${item.isButton ? "sansare" : ""}`}
                   whileHover={{ 
-                    scale: item.isButton ? 1.05 : 1.05,
+                    scale: 1.05,
                     color: item.isButton ? "#2c2c2c" : "#e2b34b",
                     backgroundColor: item.isButton ? "#fff" : "transparent"
                   }}
@@ -103,9 +106,9 @@ const Nav = () => {
         </div>
       </motion.nav>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Navigation - Now with the same scroll behavior */}
       <motion.div 
-        className={`mobile_nav ${scrolled ? "scrolled" : ""}`}
+        className={`mobile_nav ${visible ? "visible" : "hidden"} ${scrolled ? "scrolled" : ""}`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 15 }}
@@ -121,8 +124,9 @@ const Nav = () => {
             className="hamburger"
             onClick={toggleMobileMenu}
             whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
           >
-            ☰
+            {mobileMenuOpen ? "✕" : "☰"}
           </motion.button>
         </div>
 
@@ -145,6 +149,7 @@ const Nav = () => {
                       color: item.isButton ? "#2c2c2c" : "#e2b34b",
                       backgroundColor: item.isButton ? "#fff" : "transparent"
                     }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <Link
                       to={item.target}

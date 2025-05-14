@@ -56,11 +56,11 @@
   .header_container {
     height: 110vh;
   }
-  
+
   .couple_name {
     font-size: 85px;
   }
-  
+
   .actual_place {
     font-size: 26px;
   }
@@ -72,16 +72,16 @@
     height: 80vh;
     background-position: center 70%;
   }
-  
+
   .header_content {
     margin-top: 120px;
   }
-  
+
   .couple_name {
     font-size: 65px;
     line-height: 130%;
   }
-  
+
   .actual_place {
     font-size: 22px;
     letter-spacing: 1px;
@@ -93,17 +93,17 @@
   .header_container {
     height: 70vh;
   }
-  
+
   .header_content {
     margin-top: 100px;
   }
-  
+
   .couple_name {
     font-size: 48px;
     line-height: 120%;
     margin-bottom: 15px;
   }
-  
+
   .actual_place {
     font-size: 18px;
     letter-spacing: 0.5px;
@@ -115,11 +115,11 @@
   .header_container {
     height: 60vh;
   }
-  
+
   .couple_name {
     font-size: 40px;
   }
-  
+
   .actual_place {
     font-size: 16px;
   }
@@ -130,15 +130,15 @@
   .header_container {
     height: 150vh;
   }
-  
+
   .header_content {
     margin-top: 80px;
   }
-  
+
   .couple_name {
     font-size: 50px;
   }
-  
+
   .actual_place {
     font-size: 18px;
   }

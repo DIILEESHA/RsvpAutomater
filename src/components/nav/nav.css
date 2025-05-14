@@ -12,10 +12,14 @@
   transform: translateY(-100%);
 }
 
-.nav_side.scrolled {
+.nav_side.scrolled, .mobile_nav.scrolled {
   background-color: rgba(44, 44, 44, 0.95);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 0;
+}
+
+.nav_side:not(.scrolled), .mobile_nav:not(.scrolled) {
+  background-color: transparent;
+  box-shadow: none;
 }
 
 .nb {
@@ -27,57 +31,6 @@
   margin: 0 auto;
 }
 
-.nav_sm {
-  display: flex;
-  align-items: center;
-}
-
-.j {
-  display: flex;
-  justify-content: center;
-}
-
-.nji {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.nav_ul {
-  display: flex;
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.nav_li {
-  color: #fff;
-  text-transform: uppercase;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 300;
-  font-family: "hel";
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.nav_li a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.sansare {
-  border: 1px solid #fff;
-  padding: 10px 30px;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-.nav_img {
-  width: 100px;
-  transition: all 0.3s ease;
-}
-
 /* Mobile Navigation */
 .mobile_nav {
   display: none;
@@ -85,13 +38,17 @@
   top: 0;
   width: 100%;
   z-index: 1000;
-  background-color: rgba(44, 44, 44, 0.95);
+  transition: all 0.6s ease-in-out;
   color: #fff;
   padding: 15px 20px;
 }
 
-.mobile_nav.scrolled {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.mobile_nav.hidden {
+  transform: translateY(-100%);
+}
+
+.mobile_nav.visible {
+  transform: translateY(0);
 }
 
 .mobile_nav_header {
@@ -112,6 +69,7 @@
   font-size: 24px;
   cursor: pointer;
   padding: 5px;
+  transition: all 0.3s ease;
 }
 
 .mobile_nav_menu {
@@ -149,30 +107,9 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 1024px) {
-  .nb {
-    padding: 20px 30px;
-  }
-  
-  .nav_img {
-    width: 90px;
-  }
-  
-  .nav_li {
-    font-size: 16px;
-  }
-  
-  .sansare {
-    padding: 8px 20px;
-  }
-}
-
 @media (max-width: 768px) {
   .nav_side {
     display: none;
-  }
-  .nb{
-    padding: 10px;
   }
   
   .mobile_nav {
