@@ -16,6 +16,12 @@
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: "hel";
+  src: url("./assets/hel2.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
 .logo {
   color: white;
   font-size: 20px;
@@ -50,7 +56,7 @@
     padding: 0 16px;
   }
   .ant-card .ant-card-body {
-    padding: 15px;
+    padding: 10px;
   }
 
   .site-layout-content {

@@ -6,20 +6,26 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-  padding: 2rem;
+  background-color: #f8f7f5;
+  /* background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%); */
+  /* padding: 2rem; */
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 .rsvp-card {
   width: 100%;
-  max-width: 600px;
+  /* max-width: 600px; */
+
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); */
   border: none;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: white;
+  /* transition: transform 0.3s ease, box-shadow 0.3s ease; */
+  /* background: white; */
+}
+
+.formier {
+  padding: 40px 200px;
 }
 
 .rsvp-card:hover {
@@ -48,13 +54,22 @@
   background: linear-gradient(90deg, #e67e22, #e74c3c);
   border-radius: 3px;
 }
+.rsvp_ttle {
+  text-align: center;
+  font-family: "silk", serif;
+  font-size: 65px;
+  font-weight: 300;
+  color: #000;
+  margin-bottom: 20px;
+}
 
 .rsvp-subtext {
+  font-family: "hel", sans-serif;
+  line-height: 150%;
+  font-size: 18px;
   text-align: center;
-  color: #7f8c8d;
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-  line-height: 1.6;
+  margin: 40px 0;
+  color: #000;
 }
 
 /* Event Section Styling */
@@ -88,9 +103,11 @@
 
 /* Form Elements */
 .ant-form-item-label label {
-  color: #7f8c8d !important;
-  font-size: 0.9rem;
-  font-weight: 500;
+  display: block;
+  margin: 10px 0 !important;
+  font-family: "hel", sans-serif;
+  font-size: 16px !important;
+  color: #000;
 }
 
 .ant-input,
@@ -157,6 +174,17 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+.habibi {
+  width: fit-content !important;
+  border-radius: 0!important;
+  padding: 25px 20px;
+}
+
+.hab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .ant-btn-primary:hover {
   transform: translateY(-2px);
@@ -187,11 +215,17 @@
   border-radius: 2px;
 }
 
+
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .rsvp-container {
-    padding: 1rem;
+    padding: 0rem;
   }
+.formier {
+  padding: 40px 0px;
+}
 
   .rsvp-card {
     border-radius: 12px;

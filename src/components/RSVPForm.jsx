@@ -51,7 +51,10 @@ const RSVPForm = () => {
         const docSnap = querySnapshot.docs[0];
         const guestData = docSnap.data();
 
-        if (!guestData.invitedEvents || !Array.isArray(guestData.invitedEvents)) {
+        if (
+          !guestData.invitedEvents ||
+          !Array.isArray(guestData.invitedEvents)
+        ) {
           setError("This guest has no events assigned");
           return;
         }
@@ -69,9 +72,11 @@ const RSVPForm = () => {
         };
 
         // Initialize with existing values or 0
-        guestData.invitedEvents.forEach(event => {
-          initialValues.events[event] = guestData.rsvpStatus?.[event] || "pending";
-          initialValues.additionalGuests[event] = guestData.additionalGuests?.[event] || 0;
+        guestData.invitedEvents.forEach((event) => {
+          initialValues.events[event] =
+            guestData.rsvpStatus?.[event] || "pending";
+          initialValues.additionalGuests[event] =
+            guestData.additionalGuests?.[event] || 0;
         });
 
         form.setFieldsValue(initialValues);
@@ -92,9 +97,11 @@ const RSVPForm = () => {
     try {
       // Clean up additional guests - set to 0 if not attending
       const cleanedAdditionalGuests = {};
-      Object.keys(values.additionalGuests).forEach(event => {
-        cleanedAdditionalGuests[event] = 
-          values.events[event] === "accepted" ? (values.additionalGuests[event] || 0) : 0;
+      Object.keys(values.additionalGuests).forEach((event) => {
+        cleanedAdditionalGuests[event] =
+          values.events[event] === "accepted"
+            ? values.additionalGuests[event] || 0
+            : 0;
       });
 
       const updateData = {
@@ -133,110 +140,125 @@ const RSVPForm = () => {
   return (
     <div className="rsvp-container">
       <Card className="rsvp-card">
-        <Title level={3} className="rsvp-title">
-          Hi {guest?.name}!
-        </Title>
-        <p className="rsvp-subtext">
-          Please let us know if you'll be attending our wedding events:
-        </p>
+        <div className="formier">
+          <h2 className="rsvp_ttle">RSVP</h2>
 
-        <Form form={form} onFinish={onFinish} layout="vertical">
-          {guest?.invitedEvents?.map((event) => {
-            const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
-            return (
-              <div key={event} className="rsvp-event">
-                <Title level={4} className="event-title">
-                  {event.charAt(0).toUpperCase() + event.slice(1)}
-                </Title>
-                
-                {maxAdditional > 0 ? (
-                  <p className="event-guest-info">
-                    You can bring up to {maxAdditional} additional guest{maxAdditional !== 1 ? 's' : ''}
-                  </p>
-                ) : (
-                  <Tag color="orange" style={{ marginBottom: 8 }}>
-                    No additional guests allowed for this event
-                  </Tag>
-                )}
-
-                <Form.Item
-                  name={["events", event]}
-                  label="Will you attend?"
-                  rules={[{ required: true, message: "Please select an option" }]}
-                >
-                  <Radio.Group className="rsvp-radio-group">
-                    <Radio value="accepted">Yes, I'll be there</Radio>
-                    <Radio value="rejected">No, I can't make it</Radio>
-                  </Radio.Group>
-                </Form.Item>
-
-                <Form.Item shouldUpdate>
-                  {() => {
-                    const attendance = form.getFieldValue(["events", event]);
-                    return attendance === "accepted" && maxAdditional > 0 ? (
-                      <Form.Item
-                        name={["additionalGuests", event]}
-                        label="Number of additional guests"
-                        initialValue={0}
-                        rules={[
-                          {
-                            validator: (_, value) => {
-                              if (value > maxAdditional) {
-                                return Promise.reject(`Maximum ${maxAdditional} additional guest${maxAdditional !== 1 ? 's' : ''} allowed`);
-                              }
-                              if (value < 0) {
-                                return Promise.reject("Cannot be negative");
-                              }
-                              return Promise.resolve();
-                            }
-                          }
-                        ]}
-                      >
-                        <InputNumber
-                          min={0}
-                          max={maxAdditional}
-                          placeholder="0"
-                          style={{ width: '100%' }}
-                        />
-                      </Form.Item>
-                    ) : null;
-                  }}
-                </Form.Item>
-              </div>
-            );
-          })}
-
-          <Title level={4} className="extra-title">
-            Extra Info
+          <Title level={3} className="rsvp-title">
+            Hi {guest?.name}!
           </Title>
+          <p className="rsvp-subtext">
+            Please let us know if you'll be attending our wedding events: We
+            can't wait to celebrate our special day with you, and your presence
+            means the world to us!
+          </p>
 
-          <Form.Item
-            name="dietaryPreferences"
-            label="Dietary preferences (optional)"
-          >
-            <Input.TextArea placeholder="e.g., Vegetarian, Gluten-free, etc." />
-          </Form.Item>
+          <Form form={form} onFinish={onFinish} layout="vertical">
+            {guest?.invitedEvents?.map((event) => {
+              const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
+              return (
+                <div key={event} className="rsvp-event">
+                  <Title level={4} className="event-title">
+                    {event.charAt(0).toUpperCase() + event.slice(1)}
+                  </Title>
 
-          <Form.Item
-            name="specialRequirements"
-            label="Special requirements or notes"
-          >
-            <Input.TextArea placeholder="e.g., wheelchair access, baby seat, etc." />
-          </Form.Item>
+                  {maxAdditional > 0 ? (
+                    <p className="event-guest-info">
+                      You can bring up to {maxAdditional} additional guest
+                      {maxAdditional !== 1 ? "s" : ""}
+                    </p>
+                  ) : (
+                    <Tag color="orange" style={{ marginBottom: 8 }}>
+                      No additional guests allowed for this event
+                    </Tag>
+                  )}
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              loading={submitting}
-              disabled={!guest}
-              block
+                  <Form.Item
+                    name={["events", event]}
+                    label="Will you attend?"
+                    rules={[
+                      { required: true, message: "Please select an option" },
+                    ]}
+                  >
+                    <Radio.Group className="rsvp-radio-group">
+                      <Radio value="accepted">Yes, I'll be there</Radio>
+                      <Radio value="rejected">No, I can't make it</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+
+                  <Form.Item shouldUpdate>
+                    {() => {
+                      const attendance = form.getFieldValue(["events", event]);
+                      return attendance === "accepted" && maxAdditional > 0 ? (
+                        <Form.Item
+                          name={["additionalGuests", event]}
+                          label="Number of additional guests"
+                          initialValue={0}
+                          rules={[
+                            {
+                              validator: (_, value) => {
+                                if (value > maxAdditional) {
+                                  return Promise.reject(
+                                    `Maximum ${maxAdditional} additional guest${
+                                      maxAdditional !== 1 ? "s" : ""
+                                    } allowed`
+                                  );
+                                }
+                                if (value < 0) {
+                                  return Promise.reject("Cannot be negative");
+                                }
+                                return Promise.resolve();
+                              },
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            min={0}
+                            max={maxAdditional}
+                            placeholder="0"
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+                      ) : null;
+                    }}
+                  </Form.Item>
+                </div>
+              );
+            })}
+
+            <Title level={4} className="extra-title">
+              Extra Info
+            </Title>
+
+            <Form.Item
+              name="dietaryPreferences"
+              label="Dietary preferences (optional)"
             >
-              Submit RSVP
-            </Button>
-          </Form.Item>
-        </Form>
+              <Input.TextArea placeholder="e.g., Vegetarian, Gluten-free, etc." />
+            </Form.Item>
+
+            <Form.Item
+              name="specialRequirements"
+              label="Special requirements or notes"
+            >
+              <Input.TextArea placeholder="e.g., wheelchair access, baby seat, etc." />
+            </Form.Item>
+            <div className="hab">
+              <Form.Item>
+                <Button
+                  className="habibi"
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={submitting}
+                  disabled={!guest}
+                  block
+                >
+                  Submit RSVP
+                </Button>
+              </Form.Item>
+            </div>
+          </Form>
+        </div>
       </Card>
     </div>
   );
