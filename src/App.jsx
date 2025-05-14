@@ -15,6 +15,7 @@ import Login from "./components/Login";
 import "./App.css";
 import ThankYouPage from "./components/ThankYouPage";
 import { auth } from "./firebase";
+import Home from "./pages/home/Home";
 
 const { Header, Content } = Layout;
 
@@ -24,8 +25,8 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     // Check localStorage for auth status
-    const storedAuth = localStorage.getItem('isAuthenticated');
-    if (storedAuth === 'true') {
+    const storedAuth = localStorage.getItem("isAuthenticated");
+    if (storedAuth === "true") {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
@@ -53,6 +54,7 @@ function AppLayout() {
         <div className="site-layout-content">
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/" element={<Home />} />
             <Route
               path="/dashboard"
               element={

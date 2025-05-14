@@ -27,6 +27,8 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
+import { HomeOutlined } from "@ant-design/icons";
+
 import { db } from "../firebase";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
@@ -79,7 +81,9 @@ const EventDetailsPDF = ({ guest, events }) => (
     <Page style={styles.page}>
       <View style={styles.header}>
         <Text style={styles.title}> Wedding Celebration Details</Text>
-        <Text style={styles.subtitle}>Honoring our special guest, {guest.name}</Text>
+        <Text style={styles.subtitle}>
+          Honoring our special guest, {guest.name}
+        </Text>
       </View>
 
       <View style={styles.line} />
@@ -104,7 +108,6 @@ const EventDetailsPDF = ({ guest, events }) => (
     </Page>
   </Document>
 );
-
 
 const styles = StyleSheet.create({
   page: {
@@ -172,7 +175,6 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
 });
-
 
 const RSVPForm = () => {
   const { guestId } = useParams();
@@ -302,31 +304,40 @@ const RSVPForm = () => {
   return (
     <div className="rsvp-container">
       <Card className="rsvp-card">
-        <div className="formier">
+        <div className="seca">
+          <Link to="/">
+            <HomeOutlined style={{ fontSize: "16px", color: "#000" }} />
+          </Link>
+
+          <h2 className="">/</h2>
+          <h2 className="daspi">rsvp</h2>
+        </div>
           <h2 className="rsvp_ttle">Wedding RSVP</h2>
 
-          <Title level={3} className="rsvp-title">
+          <Title level={3} className="ty">
             Hi {guest?.name}!
           </Title>
+          <div className="lka">
+            <Text style={{ textAlign: "center" }} className="rsvpt">
+              We can't wait to celebrate our special day with you! Please let us
+              know if you'll be attending each event.
+            </Text>
+          </div>
+        <div className="formier">
 
-          <Text style={{textAlign:"center"}} className="rsvp-subtext">
-            We can't wait to celebrate our special day with you! Please let us
-            know if you'll be attending each event.
-          </Text>
-
-          <Divider />
+          {/* <Divider /> */}
           <div className="event-details-section">
-            <Title level={4} className="section-title">
+            {/* <Title level={4} className="section-title">
               Your Invited Events
-            </Title>
-          <Divider />
+            </Title> */}
+            {/* <Divider /> */}
 
             <Row gutter={[16, 16]}>
               {guest?.invitedEvents?.map((eventKey) => {
                 const event = eventDetails[eventKey];
                 return (
                   <Col xs={24} sm={12} key={eventKey}>
-                    <Card className="event-card">
+                    <Card className="malika">
                       <Badge.Ribbon text={event.name} color="#722ed1">
                         <div className="event-content">
                           <Descriptions column={1} size="small">
@@ -339,7 +350,6 @@ const RSVPForm = () => {
                             <Descriptions.Item label="Location">
                               {event.location}
                             </Descriptions.Item>
-                    
                           </Descriptions>
                         </div>
                       </Badge.Ribbon>
@@ -352,7 +362,7 @@ const RSVPForm = () => {
 
           <Divider />
 
-          <Form form={form} onFinish={onFinish} layout="vertical">
+          <Form className="dull" form={form} onFinish={onFinish} layout="vertical">
             {guest?.invitedEvents?.map((event) => {
               const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
               const eventInfo = eventDetails[event];

@@ -9,7 +9,12 @@
   font-weight: normal;
   font-style: normal;
 }
-
+@font-face {
+  font-family: "silk";
+  src: url("./assets/minek.ttf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
 @font-face {
   font-family: "hel";
   src: url("./assets/hel.ttf") format("opentype");
@@ -41,6 +46,21 @@
   padding: 30px;
 }
 
+.rsvpt {
+  /* display: none; */
+  font-size: 18px;
+  /* width: 80%; */
+  font-family: "hel";
+  text-align: center !important;
+  margin: 0 auto;
+}
+
+.lka {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .samiya {
@@ -53,7 +73,7 @@
     display: flex;
   }
   .ant-layout-content {
-    padding: 0 16px;
+    padding: 0 0px;
   }
   .ant-card .ant-card-body {
     padding: 10px;
