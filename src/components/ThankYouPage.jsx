@@ -81,12 +81,7 @@ const ThankYouPage = () => {
   return (
     <div className="thankyou-container">
       <Card className="thankyou-card">
-        <Image
-          src="/thank-you-image.jpg" // Replace with your image
-          alt="Thank You"
-          preview={false}
-          className="thankyou-image"
-        />
+       
         
         <Title level={2} className="thankyou-title">
           Thank You for Your RSVP!
@@ -115,11 +110,7 @@ const ThankYouPage = () => {
           </div>
         )}
         
-        <div className="thankyou-footer">
-          <Text type="secondary">
-            Need to make changes? Contact us at wedding@example.com
-          </Text>
-        </div>
+       
       </Card>
     </div>
   );
