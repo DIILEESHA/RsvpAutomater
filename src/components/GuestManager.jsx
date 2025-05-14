@@ -629,44 +629,59 @@ const GuestManager = () => {
     }
   };
 
-  const exportToCSV = () => {
-    if (filteredGuests.length === 0) {
-      message.warning("No data to export");
-      return;
-    }
+const exportToCSV = () => {
+  if (filteredGuests.length === 0) {
+    message.warning("No data to export");
+    return;
+  }
 
-    const data = filteredGuests.map((guest) => {
-      const rsvpStatus = {};
-      events.forEach((event) => {
-        rsvpStatus[`${event}_status`] = guest.rsvpStatus?.[event] || "pending";
-        rsvpStatus[`${event}_additional`] =
-          guest.additionalGuests?.[event] || 0;
-        rsvpStatus[`${event}_allowed`] = guest.eventGuests?.[event] || 1;
-      });
+  const data = filteredGuests.map((guest) => {
+    // Base information
+    const guestData = {
+      "Name": guest.name,
+      "Phone": guest.phone,
+      "Email": guest.email || "",
+      "Side": guest.side,
+      "Invited Events": guest.invitedEvents?.join(", ") || "",
+      "Unique Link": `${baseUrl}/${guest.uniqueLink}`,
+      "Dietary Preferences": guest.dietaryPreferences || "",
+      "Special Requirements": guest.specialRequirements || "",
+      "Last Updated": guest.lastUpdated 
+        ? new Date(guest.lastUpdated).toLocaleString() 
+        : ""
+    };
 
-      return {
-        Name: guest.name,
-        Phone: guest.phone,
-        Email: guest.email || "",
-        Side: guest.side,
-        "Invited Events": guest.invitedEvents?.join(", ") || "",
-        "Unique Link": `${baseUrl}/${guest.uniqueLink}`,
-        ...rsvpStatus,
-        "Dietary Preferences": guest.dietaryPreferences || "",
-        "Special Requirements": guest.specialRequirements || "",
-        "Last Updated": guest.lastUpdated
-          ? new Date(guest.lastUpdated).toLocaleString()
-          : "",
-      };
+    // Add event-specific columns
+    events.forEach(event => {
+      // Guest limits
+      guestData[`${event} - Allowed Guests`] = guest.eventGuests?.[event] || 1;
+      
+      // RSVP status
+      guestData[`${event} - RSVP Status`] = guest.rsvpStatus?.[event] || "pending";
+      
+      // Additional guests
+      guestData[`${event} - Additional Guests`] = guest.additionalGuests?.[event] || 0;
+      
+      // Total attending (main guest + additional)
+      const isAttending = guest.rsvpStatus?.[event] === "accepted";
+      guestData[`${event} - Total Attending`] = isAttending 
+        ? 1 + (guest.additionalGuests?.[event] || 0)
+        : 0;
     });
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Guests");
-    XLSX.writeFile(wb, "wedding_guests.xlsx");
-    message.success("Exported to Excel successfully");
-  };
+    return guestData;
+  });
 
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Guests");
+  
+  // Generate filename with current date
+  const dateStr = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, `wedding_guests_${dateStr}.xlsx`);
+  
+  message.success("Exported guest list successfully");
+};
   const exportToExcel = () => {
     exportToCSV(); // Using the same function since XLSX handles both
   };
