@@ -87,6 +87,10 @@
 .nanas {
   margin-bottom: 5px;
 }
+
+.modal-close{
+  background-color: #000!important;
+}
 .event-time,
 .event-date {
   display: flex;

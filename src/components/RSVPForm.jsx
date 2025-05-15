@@ -94,7 +94,8 @@ const EVENT_DETAILS = {
     location: "Family Residence",
     description:
       "Traditional turmeric ceremony where close family applies turmeric paste to the bride and groom",
-    image: "https://i.imgur.com/example.jpeg",
+    image:
+      "https://ik.imagekit.io/fh2hj1ayv/2F98B1D0-66BC-4E74-8336-C1F95AC3A658.jpeg?updatedAt=1747325707341",
     color: "#faad14",
     dressCode: "Yellow traditional",
     parkingInfo: "Street parking available",
@@ -105,7 +106,8 @@ const EVENT_DETAILS = {
     time: "7:00 PM",
     location: "Grand Ballroom",
     description: "Evening celebration with dinner and dancing",
-    image: "https://i.imgur.com/example2.jpeg",
+    image:
+      "https://ik.imagekit.io/fh2hj1ayv/C98D7F1C-41CF-4022-9B91-17C7D497D113.jpeg?updatedAt=1747325707721",
     color: "#1890ff",
     dressCode: "Formal attire",
     parkingInfo: "Valet parking available",
@@ -329,6 +331,7 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
       footer={null}
       centered
       width={800}
+      maskClosable={true}
       className="event-modal"
       bodyStyle={{ padding: 0 }}
       zIndex={1000}
@@ -341,7 +344,7 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
             preview={false}
             style={{
               width: "100%",
-              height: "300px",
+              height: "",
               objectFit: "cover",
               display: "block",
             }}
