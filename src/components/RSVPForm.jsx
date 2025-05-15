@@ -50,7 +50,6 @@ import "./RSVPForm.css";
 
 const { Title, Paragraph, Text: AntText } = Typography;
 
-// Memoized event data
 const EVENT_DETAILS = {
   sangeet: {
     name: "Sangeet Ceremony",

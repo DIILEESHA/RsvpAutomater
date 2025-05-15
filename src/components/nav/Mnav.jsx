@@ -15,13 +15,13 @@ const MNav = () => {
       const currentScrollPos = window.pageYOffset;
       const isScrollingUp = prevScrollPos > currentScrollPos;
       const atTop = currentScrollPos < 50;
-      
+
       setVisible(isScrollingUp || atTop);
       setPrevScrollPos(currentScrollPos);
-      
+
       // Show background when scrolled or when menu is forced open
       setScrolled(!atTop || forceBackground);
-      
+
       if (!isScrollingUp && currentScrollPos > 100) {
         setMobileMenuOpen(false);
         setForceBackground(false);
@@ -39,15 +39,15 @@ const MNav = () => {
   };
 
   const navItems = [
-    { name: "We're getting married", target: "story" },
-    { name: "Accomodation", target: "accomodation" },
-    { name: "Gallery", target: "gallery" },
-    { name: "RSVP", target: "rsvp", isButton: true }
+    { name: "We're getting married", href: "/", type: "link" },
+    { name: "Accomodation", href: "/accommodation", type: "link" },
+    { name: "Gallery", href: "/gallery", type: "link" },
+    // { name: "RSVP", target: "rsvp", isButton: true, type: "scroll" },
   ];
 
   return (
     <>
-      <motion.div 
+      <motion.div
         className={`mobile_nav ${visible ? "visible" : "hidden"} ${
           scrolled || forceBackground ? "scrolled" : ""
         }`}
@@ -61,7 +61,7 @@ const MNav = () => {
             alt="Wedding Logo"
             className="mobile_nav_img"
           />
-          <motion.button 
+          <motion.button
             className="hamburger"
             onClick={toggleMobileMenu}
             whileHover={{ scale: 1.1 }}
@@ -73,7 +73,7 @@ const MNav = () => {
 
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div 
+            <motion.div
               className="mobile_nav_menu"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
@@ -82,28 +82,44 @@ const MNav = () => {
             >
               <ul>
                 {navItems.map((item) => (
-                  <motion.li 
-                    key={item.target}
-                    className={`mobile_nav_li ${item.isButton ? "mobile_sansare" : ""}`}
-                    whileHover={{ 
+                  <motion.li
+                    key={item.name}
+                    className={`mobile_nav_li ${
+                      item.isButton ? "mobile_sansare" : ""
+                    }`}
+                    whileHover={{
                       scale: 1.05,
                       color: item.isButton ? "#2c2c2c" : "#e2b34b",
-                      backgroundColor: item.isButton ? "#fff" : "transparent"
+                      backgroundColor: item.isButton ? "#fff" : "transparent",
                     }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Link
-                      to={item.target}
-                      smooth={true}
-                      duration={500}
-                      offset={-80}
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setForceBackground(false);
-                      }}
-                    >
-                      {item.name}
-                    </Link>
+                    {item.type === "scroll" ? (
+                      <Link
+                        to={item.target}
+                        smooth={true}
+                        duration={500}
+                        offset={-80}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setForceBackground(false);
+                        }}
+                        style={{ color: "#fff", textDecoration: "none" }}
+                      >
+                        {item.name}
+                      </Link>
+                    ) : (
+                      <a
+                        href={item.href}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setForceBackground(false);
+                        }}
+                        style={{ color: "#fff", textDecoration: "none" }}
+                      >
+                        {item.name}
+                      </a>
+                    )}
                   </motion.li>
                 ))}
               </ul>

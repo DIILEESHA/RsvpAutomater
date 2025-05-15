@@ -18,6 +18,8 @@ import { auth } from "./firebase";
 import Home from "./pages/home/Home";
 import Nav from "./components/nav/Nav";
 import MNav from "./components/nav/Mnav";
+import Acc from "./pages/accomadations/Acc";
+import Gallery from "./pages/gallery/Gallery";
 
 const { Header, Content } = Layout;
 
@@ -49,12 +51,7 @@ function AppLayout() {
   const location = useLocation();
 
   // Define the paths where you want to hide Nav, MNav, and footer
-  const hideLayoutComponents = [
-    "/rsvp",
-    "/thank-you",
-    "/dashboard",
-    "/login"
-  ];
+  const hideLayoutComponents = ["/rsvp", "/thank-you", "/dashboard", "/login"];
 
   // Check if current route starts with any of the paths to hide
   const shouldHideLayout = hideLayoutComponents.some((path) =>
@@ -79,6 +76,8 @@ function AppLayout() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
+            <Route path="/accommodation" element={<Acc />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route
               path="/dashboard"
               element={
@@ -99,7 +98,6 @@ function AppLayout() {
     </Layout>
   );
 }
-
 
 function App() {
   return (

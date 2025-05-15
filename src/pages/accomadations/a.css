@@ -1,0 +1,149 @@
+/* Header styles */
+.maliz {
+  background-image: url("https://image-tc.galaxy.tf/wijpeg-3abhuuo89rcnq829gh796aza5/the-londoner-hotel-8-at-the-londoner-shima-garden_standard.jpg?crop=112%2C0%2C1777%2C1333") !important;
+  /* height: 100vh; */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.maliz::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* z-index: 1; */
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.header_content {
+  position: relative;
+  z-index: 10;
+  padding: 0 20px;
+}
+
+.couple_name {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+
+.actual_place {
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+/* Content styles */
+.dolx {
+  max-width: 900px;
+  margin: 80px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.story_title {
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  font-weight: 300;
+  text-align: center;
+}
+
+.story_para {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.op {
+  text-align: center;
+}
+
+/* Gallery styles */
+.gallery-wrapper {
+  max-width: 1200px;
+  margin: 0 auto 80px;
+  padding: 0 20px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 0 20px;
+}
+
+.image-container {
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  aspect-ratio: 4/3;
+}
+
+.image-container:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* Modal styles */
+.ant-modal-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .couple_name {
+    font-size: 2.5rem;
+  }
+
+  .image-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .gallery-wrapper {
+    padding: 0;
+  }
+
+  .dolx {
+    margin: 30px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .couple_name {
+    font-size: 2rem;
+  }
+
+  .actual_place {
+    font-size: 1rem;
+  }
+
+  .story_title {
+    font-size: 1.8rem;
+  }
+
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -20,7 +20,7 @@
 .nb {
   display: grid;
   padding: 20px 40px;
-  grid-template-columns: 1.5fr 1fr 1.5fr;
+  grid-template-columns: 1.5fr 1.5fr;
 }
 
 .nav_sm {
@@ -37,9 +37,10 @@
 }
 
 .j {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* display: flex; */
+
+  /* align-items: center; */
+  /* justify-content: center; */
   /* position: absolute; */
 }
 
