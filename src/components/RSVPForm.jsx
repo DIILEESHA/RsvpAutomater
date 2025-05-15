@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import 'antd/dist/reset.css';
+import "antd/dist/reset.css";
 import {
   Card,
   Form,
@@ -29,8 +29,8 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { 
-  HomeOutlined, 
+import {
+  HomeOutlined,
   DownloadOutlined,
   CalendarOutlined,
   ClockCircleOutlined,
@@ -56,7 +56,8 @@ const EVENT_DETAILS = {
     date: "Wednesday 20th August 2025",
     time: "6:30 PM",
     location: "Crown Plaza Gerrards Cross",
-    description: "An evening of music and dance performances where families come together to celebrate through song and dance. Expect live performances, delicious food, and lots of fun!",
+    description:
+      "An evening of music and dance performances where families come together to celebrate through song and dance. Expect live performances, delicious food, and lots of fun!",
     image: "https://i.imgur.com/BjhRR47.jpeg",
     color: "#722ed1",
     dressCode: "Colorful traditional",
@@ -79,109 +80,139 @@ const EVENT_DETAILS = {
     date: "Tuesday 26th August 2025",
     time: "11:45 AM",
     location: "The Grove Hotel",
-    description: "Our sacred wedding ceremony with traditional rituals followed by dinner and celebrations.",
+    description:
+      "Our sacred wedding ceremony with traditional rituals followed by dinner and celebrations.",
     image: "https://i.imgur.com/zTXENpe.jpeg",
     color: "#f5222d",
     dressCode: "Traditional Indian",
     parkingInfo: "Valet service available at hotel entrance",
   },
+  haldi: {
+    name: "Haldi Ceremony",
+    date: "Tuesday 19th August 2025",
+    time: "10:00 AM",
+    location: "Family Residence",
+    description:
+      "Traditional turmeric ceremony where close family applies turmeric paste to the bride and groom",
+    image: "https://i.imgur.com/example.jpeg",
+    color: "#faad14",
+    dressCode: "Yellow traditional",
+    parkingInfo: "Street parking available",
+  },
+  reception: {
+    name: "Reception",
+    date: "Wednesday 27th August 2025",
+    time: "7:00 PM",
+    location: "Grand Ballroom",
+    description: "Evening celebration with dinner and dancing",
+    image: "https://i.imgur.com/example2.jpeg",
+    color: "#1890ff",
+    dressCode: "Formal attire",
+    parkingInfo: "Valet parking available",
+  },
 };
 
 // PDF Component for Event Details
 const EventDetailsPDF = React.memo(({ guest, events }) => {
-  const styles = useMemo(() => StyleSheet.create({
-    page: {
-      padding: 40,
-      fontFamily: "Helvetica",
-      backgroundColor: "#fff8f0",
-    },
-    header: {
-      marginBottom: 30,
-      textAlign: "center",
-      padding: 10,
-      borderRadius: 10,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: "bold",
-      color: "#000",
-      marginBottom: 5,
-    },
-    subtitle: {
-      fontSize: 16,
-      color: "#5d6d7e",
-    },
-    line: {
-      height: 1,
-      backgroundColor: "#d5d8dc",
-      marginVertical: 20,
-    },
-    eventSection: {
-      marginBottom: 30,
-      padding: 15,
-      backgroundColor: "#ffffff",
-      borderRadius: 8,
-      borderColor: "#f2f3f4",
-      borderWidth: 1,
-    },
-    eventName: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: "#000",
-      marginBottom: 12,
-    },
-    eventDetail: {
-      fontSize: 14,
-      marginBottom: 6,
-      color: "#2e4053",
-    },
-    eventDescription: {
-      fontSize: 12,
-      marginTop: 10,
-      marginBottom: 10,
-      color: "#7f8c8d",
-      fontStyle: "italic",
-    },
-    divider: {
-      height: 1,
-      backgroundColor: "#f0f0f0",
-      marginTop: 15,
-    },
-    footer: {
-      marginTop: 40,
-      fontSize: 14,
-      textAlign: "center",
-      color: "#6e2c00",
-      fontStyle: "italic",
-    },
-    imageContainer: {
-      marginBottom: 15,
-      textAlign: "center",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: 500,
-    },
-    eventImage: {
-      maxWidth: "100%",
-      maxHeight: 500,
-      marginBottom: 10,
-      borderRadius: 4,
-      objectFit: "contain",
-    },
-  }), []);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        page: {
+          padding: 40,
+          fontFamily: "Helvetica",
+          backgroundColor: "#fff8f0",
+        },
+        header: {
+          marginBottom: 30,
+          textAlign: "center",
+          padding: 10,
+          borderRadius: 10,
+        },
+        title: {
+          fontSize: 24,
+          fontWeight: "bold",
+          color: "#000",
+          marginBottom: 5,
+        },
+        subtitle: {
+          fontSize: 16,
+          color: "#5d6d7e",
+        },
+        line: {
+          height: 1,
+          backgroundColor: "#d5d8dc",
+          marginVertical: 20,
+        },
+        eventSection: {
+          marginBottom: 30,
+          padding: 15,
+          backgroundColor: "#ffffff",
+          borderRadius: 8,
+          borderColor: "#f2f3f4",
+          borderWidth: 1,
+        },
+        eventName: {
+          fontSize: 18,
+          fontWeight: "bold",
+          color: "#000",
+          marginBottom: 12,
+        },
+        eventDetail: {
+          fontSize: 14,
+          marginBottom: 6,
+          color: "#2e4053",
+        },
+        eventDescription: {
+          fontSize: 12,
+          marginTop: 10,
+          marginBottom: 10,
+          color: "#7f8c8d",
+          fontStyle: "italic",
+        },
+        divider: {
+          height: 1,
+          backgroundColor: "#f0f0f0",
+          marginTop: 15,
+        },
+        footer: {
+          marginTop: 40,
+          fontSize: 14,
+          textAlign: "center",
+          color: "#6e2c00",
+          fontStyle: "italic",
+        },
+        imageContainer: {
+          marginBottom: 15,
+          textAlign: "center",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 500,
+        },
+        eventImage: {
+          maxWidth: "100%",
+          maxHeight: 500,
+          marginBottom: 10,
+          borderRadius: 4,
+          objectFit: "contain",
+        },
+      }),
+    []
+  );
 
   return (
     <Document>
       <Page style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.title}>Wedding Celebration Details</Text>
-          <Text style={styles.subtitle}>Honoring our special guest, {guest.name}</Text>
+          <Text style={styles.subtitle}>
+            Honoring our special guest, {guest?.name || "Guest"}
+          </Text>
         </View>
 
         <View style={styles.line} />
 
-        {events.map((eventKey) => {
+        {events?.map((eventKey) => {
           const event = EVENT_DETAILS[eventKey];
           if (!event) return null;
 
@@ -191,25 +222,35 @@ const EventDetailsPDF = React.memo(({ guest, events }) => {
 
               {event.image && (
                 <View style={styles.imageContainer}>
-                  <PDFImage style={styles.eventImage} src={event.image} cache={false} />
+                  <PDFImage
+                    style={styles.eventImage}
+                    src={event.image}
+                    cache={false}
+                  />
                 </View>
               )}
 
               <Text style={styles.eventDetail}>Date: {event.date}</Text>
               <Text style={styles.eventDetail}>Time: {event.time}</Text>
               <Text style={styles.eventDetail}>Location: {event.location}</Text>
-              <Text style={styles.eventDetail}>Dress Code: {event.dressCode}</Text>
+              <Text style={styles.eventDetail}>
+                Dress Code: {event.dressCode}
+              </Text>
 
               {event.description && (
                 <Text style={styles.eventDescription}>{event.description}</Text>
               )}
 
               {event.parkingInfo && (
-                <Text style={styles.eventDetail}>Parking: {event.parkingInfo}</Text>
+                <Text style={styles.eventDetail}>
+                  Parking: {event.parkingInfo}
+                </Text>
               )}
 
               {event.specialNotes && (
-                <Text style={styles.eventDetail}>Notes: {event.specialNotes}</Text>
+                <Text style={styles.eventDetail}>
+                  Notes: {event.specialNotes}
+                </Text>
               )}
 
               <View style={styles.divider} />
@@ -217,7 +258,9 @@ const EventDetailsPDF = React.memo(({ guest, events }) => {
           );
         })}
 
-        <Text style={styles.footer}>We can't wait to celebrate with you! 💐</Text>
+        <Text style={styles.footer}>
+          We can't wait to celebrate with you! 💐
+        </Text>
       </Page>
     </Document>
   );
@@ -228,7 +271,7 @@ const EventCard = React.memo(({ eventKey, onClick }) => {
   if (!event) return null;
 
   return (
-    <motion.div 
+    <motion.div
       onClick={onClick}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
@@ -246,10 +289,15 @@ const EventCard = React.memo(({ eventKey, onClick }) => {
           <div className="event-details">
             <h3 className="event-name">{event.name}</h3>
             <div className="event-date">
-              <CalendarOutlined /> {event.date}
+              <h2 className="hals">
+                <CalendarOutlined />
+                {event.date}
+              </h2>
             </div>
             <div className="event-time">
-              <ClockCircleOutlined /> {event.time}
+              <h2 className="hals">
+                <ClockCircleOutlined /> {event.time}
+              </h2>
             </div>
             <div className="event-dresscode">
               <Tag color={event.color}>{event.dressCode}</Tag>
@@ -318,14 +366,14 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
             <Descriptions.Item label="Dress Code">
               {event.dressCode}
             </Descriptions.Item>
-            {/* {event.parkingInfo && (
-              <Descriptions.Item label="Parking">
-                {event.parkingInfo}
+            {event.parkingInfo && (
+              <Descriptions.Item label="">
+                {/* {event.parkingInfo} */}
               </Descriptions.Item>
-            )} */}
+            )}
           </Descriptions>
-
-          {/* {event.description && (
+{/* 
+          {event.description && (
             <>
               <Divider />
               <Paragraph strong>Event Description:</Paragraph>
@@ -341,8 +389,8 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
             </>
           )} */}
 
-          {/* <div className="event-modal-actions" style={{ marginTop: "24px", textAlign: "center" }}>
-            <PDFDownloadLink
+          <div className="event-modal-actions" style={{ marginTop: "24px", textAlign: "center" }}>
+            {/* <PDFDownloadLink
               document={<EventDetailsPDF guest={{ name: "Guest" }} events={[eventKey]} />}
               fileName={`${event.name}_details.pdf`}
             >
@@ -355,8 +403,8 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
                   {loading ? "Preparing..." : "Download Details"}
                 </Button>
               )}
-            </PDFDownloadLink>
-          </div> */}
+            </PDFDownloadLink> */}
+          </div>
         </div>
       </div>
     </Modal>
@@ -395,6 +443,17 @@ const RSVPForm = () => {
         return;
       }
 
+      // Filter out any events that aren't defined in EVENT_DETAILS
+      const validEvents = guestData.invitedEvents.filter(event => 
+        EVENT_DETAILS.hasOwnProperty(event)
+      );
+
+      if (validEvents.length === 0) {
+        setError("No valid events assigned to this guest");
+        setLoading(false);
+        return;
+      }
+
       const initialValues = {
         events: {},
         additionalGuests: {},
@@ -402,16 +461,17 @@ const RSVPForm = () => {
         specialRequirements: guestData.specialRequirements || "",
       };
 
-      guestData.invitedEvents.forEach((event) => {
-        if (EVENT_DETAILS[event]) {
-          initialValues.events[event] = guestData.rsvpStatus?.[event] || "pending";
-          initialValues.additionalGuests[event] = guestData.additionalGuests?.[event] || 0;
-        }
+      validEvents.forEach((event) => {
+        initialValues.events[event] =
+          guestData.rsvpStatus?.[event] || "pending";
+        initialValues.additionalGuests[event] =
+          guestData.additionalGuests?.[event] || 0;
       });
 
       setGuest({
         id: docSnap.id,
         ...guestData,
+        invitedEvents: validEvents // Update with filtered events
       });
       form.setFieldsValue(initialValues);
     } catch (err) {
@@ -426,50 +486,57 @@ const RSVPForm = () => {
     fetchGuest();
   }, [fetchGuest]);
 
-  const handleSubmit = useCallback(async (values) => {
-    if (!guest) return;
+  const handleSubmit = useCallback(
+    async (values) => {
+      if (!guest) return;
 
-    setSubmitting(true);
+      setSubmitting(true);
 
-    try {
-      const additionalGuests = values.additionalGuests || {};
-      const cleanedAdditionalGuests = {};
+      try {
+        const additionalGuests = values.additionalGuests || {};
+        const cleanedAdditionalGuests = {};
 
-      Object.keys(additionalGuests).forEach((event) => {
-        if (EVENT_DETAILS[event]) {
-          cleanedAdditionalGuests[event] = 
-            values.events?.[event] === "accepted" ? additionalGuests[event] || 0 : 0;
-        }
-      });
+        Object.keys(additionalGuests).forEach((event) => {
+          if (EVENT_DETAILS[event]) {
+            cleanedAdditionalGuests[event] =
+              values.events?.[event] === "accepted"
+                ? additionalGuests[event] || 0
+                : 0;
+          }
+        });
 
-      const updateData = {
-        rsvpStatus: values.events || {},
-        additionalGuests: cleanedAdditionalGuests,
-        dietaryPreferences: values.dietaryPreferences || "",
-        specialRequirements: values.specialRequirements || "",
-        lastUpdated: new Date().toISOString(),
-      };
+        const updateData = {
+          rsvpStatus: values.events || {},
+          additionalGuests: cleanedAdditionalGuests,
+          dietaryPreferences: values.dietaryPreferences || "",
+          specialRequirements: values.specialRequirements || "",
+          lastUpdated: new Date().toISOString(),
+        };
 
-      await updateDoc(doc(db, "guests", guest.id), updateData);
-      message.success("Thank you for your RSVP!");
+        await updateDoc(doc(db, "guests", guest.id), updateData);
+        message.success("Thank you for your RSVP!");
 
-      setTimeout(() => {
-        window.location.href = "/thank-you";
-      }, 2000);
-    } catch (error) {
-      console.error("RSVP submission error:", error);
-      message.error("Error submitting your RSVP. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }, [guest]);
+        setTimeout(() => {
+          window.location.href = "/thank-you";
+        }, 2000);
+      } catch (error) {
+        console.error("RSVP submission error:", error);
+        message.error("Error submitting your RSVP. Please try again.");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [guest]
+  );
 
   const renderEventFormItems = useMemo(() => {
     if (!guest?.invitedEvents) return null;
 
     return guest.invitedEvents.map((event) => {
-      const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
       const eventInfo = EVENT_DETAILS[event];
+      if (!eventInfo) return null;
+
+      const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
 
       return (
         <div key={event} className="rsvp-event">
@@ -543,7 +610,14 @@ const RSVPForm = () => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <Spin tip="Loading RSVP..." size="large" />
       </div>
     );
@@ -551,7 +625,7 @@ const RSVPForm = () => {
 
   if (error) {
     return (
-      <div style={{ padding: '24px' }}>
+      <div style={{ padding: "24px" }}>
         <Alert message="Error" description={error} type="error" showIcon />
       </div>
     );
@@ -581,14 +655,17 @@ const RSVPForm = () => {
         <div className="formier">
           <div className="event-details-section">
             <Row gutter={[16, 16]}>
-              {guest?.invitedEvents?.map((eventKey) => (
-                <Col xs={24} sm={12} key={eventKey}>
-                  <EventCard
-                    eventKey={eventKey}
-                    onClick={() => setSelectedEvent(eventKey)}
-                  />
-                </Col>
-              ))}
+              {guest?.invitedEvents?.map((eventKey) => {
+                if (!EVENT_DETAILS[eventKey]) return null;
+                return (
+                  <Col xs={24} sm={12} key={eventKey}>
+                    <EventCard
+                      eventKey={eventKey}
+                      onClick={() => setSelectedEvent(eventKey)}
+                    />
+                  </Col>
+                );
+              })}
             </Row>
           </div>
 
@@ -630,7 +707,10 @@ const RSVPForm = () => {
               <Input.TextArea placeholder="e.g., wheelchair access, baby seat, etc." />
             </Form.Item>
 
-            <div className="hab" style={{ display: "flex", flexDirection: "column" }}>
+            <div
+              className="hab"
+              style={{ display: "flex", flexDirection: "column" }}
+            >
               <Form.Item>
                 <Button
                   className="habibi"
@@ -645,9 +725,9 @@ const RSVPForm = () => {
                 </Button>
               </Form.Item>
 
-              {/* {guest?.invitedEvents && (
+              {guest?.invitedEvents && (
                 <div className="download-section">
-                  <PDFDownloadLink
+                  {/* <PDFDownloadLink
                     document={<EventDetailsPDF guest={guest} events={guest.invitedEvents} />}
                     fileName={`${guest.name}_wedding_details.pdf`}
                   >
@@ -662,9 +742,9 @@ const RSVPForm = () => {
                         {loading ? "Preparing PDF..." : "Download All Event Details"}
                       </Button>
                     )}
-                  </PDFDownloadLink>
+                  </PDFDownloadLink> */}
                 </div>
-              )} */}
+              )}
             </div>
           </Form>
         </div>

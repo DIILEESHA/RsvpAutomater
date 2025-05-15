@@ -94,9 +94,12 @@
   gap: 10px;
 }
 
-.hals{
+.hals {
   font-family: "hel";
   font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .event-name {
@@ -105,7 +108,7 @@
   margin-bottom: 10px;
 }
 
-.event-dresscode{
+.event-dresscode {
   margin: 10px 0;
 }
 
