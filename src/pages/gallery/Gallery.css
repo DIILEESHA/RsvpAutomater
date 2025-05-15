@@ -142,9 +142,12 @@
 
 @media (max-width: 480px) {
   .masonry-gallery {
-    column-count: 1;
+    column-count: 2;
   }
-
+  .gallery-item img {
+    height: 40vh;
+    object-fit: cover;
+  }
   .modal-close {
     top: 10px;
     right: 10px;

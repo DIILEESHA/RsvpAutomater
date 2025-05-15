@@ -372,7 +372,7 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
               </Descriptions.Item>
             )}
           </Descriptions>
-{/* 
+          {/* 
           {event.description && (
             <>
               <Divider />
@@ -389,7 +389,10 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
             </>
           )} */}
 
-          <div className="event-modal-actions" style={{ marginTop: "24px", textAlign: "center" }}>
+          <div
+            className="event-modal-actions"
+            style={{ marginTop: "24px", textAlign: "center" }}
+          >
             {/* <PDFDownloadLink
               document={<EventDetailsPDF guest={{ name: "Guest" }} events={[eventKey]} />}
               fileName={`${event.name}_details.pdf`}
@@ -444,7 +447,7 @@ const RSVPForm = () => {
       }
 
       // Filter out any events that aren't defined in EVENT_DETAILS
-      const validEvents = guestData.invitedEvents.filter(event => 
+      const validEvents = guestData.invitedEvents.filter((event) =>
         EVENT_DETAILS.hasOwnProperty(event)
       );
 
@@ -471,7 +474,7 @@ const RSVPForm = () => {
       setGuest({
         id: docSnap.id,
         ...guestData,
-        invitedEvents: validEvents // Update with filtered events
+        invitedEvents: validEvents, // Update with filtered events
       });
       form.setFieldsValue(initialValues);
     } catch (err) {
