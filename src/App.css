@@ -80,8 +80,33 @@
 .nal {
   display: none;
 }
-.gal{
+.gal {
   display: flex;
+}
+
+.nanas {
+  margin-bottom: 5px;
+}
+.event-time,
+.event-date {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hals{
+  font-family: "hel";
+  font-size: 15px;
+}
+
+.event-name {
+  font-family: "silk";
+  font-weight: 300;
+  margin-bottom: 10px;
+}
+
+.event-dresscode{
+  margin: 10px 0;
 }
 
 @media screen and (max-width: 964px) {

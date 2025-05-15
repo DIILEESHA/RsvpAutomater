@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import 'antd/dist/reset.css';
 import {
   Card,
   Form,
@@ -11,12 +13,13 @@ import {
   Typography,
   InputNumber,
   Tag,
-  Image,
   Divider,
   Descriptions,
   Badge,
   Row,
   Col,
+  Modal,
+  Image,
 } from "antd";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
@@ -27,51 +30,63 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { HomeOutlined } from "@ant-design/icons";
-
+import { HomeOutlined, DownloadOutlined } from "@ant-design/icons";
+import {
+  CalendarOutlined,
+  ClockCircleOutlined,
+  EnvironmentOutlined,
+} from "@ant-design/icons";
 import { db } from "../firebase";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image as PDFImage,
+} from "@react-pdf/renderer";
 import "./RSVPForm.css";
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 
-// Event data with dates and locations
+// Enhanced event data with images and more details
 const eventDetails = {
   sangeet: {
     name: "Sangeet Ceremony",
-    date: "June 15, 2024",
-    time: "6:00 PM",
-    location: "Grand Ballroom, Taj Hotel, Mumbai",
-    description: "An evening of music and dance performances",
+    date: "Wednesday 20th August 2025",
+    time: "6:30 PM",
+    location: "Crown Plaza Gerrards Cross",
+    description:
+      "An evening of music and dance performances where families come together to celebrate through song and dance. Expect live performances, delicious food, and lots of fun!",
+    image: "https://i.imgur.com/BjhRR47.jpeg",
+    color: "#722ed1",
+    dressCode: "Colorful traditional",
+    parkingInfo: "Valet parking available at the venue",
+    specialNotes: "Please arrive 15 minutes early for seating",
   },
   mehndi: {
     name: "Mehndi Celebration",
-    date: "June 16, 2024",
-    time: "2:00 PM",
-    location: "Outdoor Garden, The Leela Palace, Mumbai",
-    description: "Traditional henna application with live music",
-  },
-  haldi: {
-    name: "Haldi Ceremony",
-    date: "June 17, 2024",
-    time: "10:00 AM",
-    location: "Family Residence, Bandra West, Mumbai",
-    description: "Turmeric ceremony with close family and friends",
+    date: "Wednesday 20th August 2025",
+    time: "6:30 PM",
+    location: "Crown Plaza Gerrards Cross",
+    description: "Traditional henna application ceremony with music and dance",
+    image: "https://i.imgur.com/BjhRR47.jpeg",
+    color: "#52c41a",
+    dressCode: "Colorful traditional",
+    parkingInfo: "Valet parking available at the venue",
   },
   wedding: {
     name: "Wedding Ceremony",
-    date: "June 18, 2024",
-    time: "7:00 PM",
-    location: "Sea View Lawn, The Oberoi, Mumbai",
-    description: "Traditional wedding ceremony followed by reception",
-  },
-  reception: {
-    name: "Reception",
-    date: "June 19, 2024",
-    time: "8:00 PM",
-    location: "Grand Ballroom, The St. Regis, Mumbai",
-    description: "Evening celebration with dinner and dancing",
+    date: "Tuesday 26th August 2025",
+    time: "11:45 AM",
+    location: "The Grove Hotel",
+    description:
+      "Our sacred wedding ceremony with traditional rituals followed by dinner and celebrations.",
+    image: "https://i.imgur.com/zTXENpe.jpeg",
+    color: "#f5222d",
+    dressCode: "Traditional Indian",
+    parkingInfo: "Valet service available at hotel entrance",
   },
 };
 
@@ -80,7 +95,7 @@ const EventDetailsPDF = ({ guest, events }) => (
   <Document>
     <Page style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}> Wedding Celebration Details</Text>
+        <Text style={styles.title}>Wedding Celebration Details</Text>
         <Text style={styles.subtitle}>
           Honoring our special guest, {guest.name}
         </Text>
@@ -90,15 +105,45 @@ const EventDetailsPDF = ({ guest, events }) => (
 
       {events.map((eventKey) => {
         const event = eventDetails[eventKey];
+        if (!event) return null;
+
         return (
-          <View key={eventKey} style={styles.eventSection}>
+          <View key={eventKey} style={styles.eventSection} wrap={false}>
             <Text style={styles.eventName}>{event.name}</Text>
-            <Text style={styles.eventDetail}> Date: {event.date}</Text>
-            <Text style={styles.eventDetail}> Time: {event.time}</Text>
-            <Text style={styles.eventDetail}> Location: {event.location}</Text>
+
+            {event.image && (
+              <View style={styles.imageContainer}>
+                <PDFImage
+                  style={styles.eventImage}
+                  src={event.image}
+                  cache={false}
+                />
+              </View>
+            )}
+
+            <Text style={styles.eventDetail}>Date: {event.date}</Text>
+            <Text style={styles.eventDetail}>Time: {event.time}</Text>
+            <Text style={styles.eventDetail}>Location: {event.location}</Text>
+            <Text style={styles.eventDetail}>
+              Dress Code: {event.dressCode}
+            </Text>
+
             {event.description && (
               <Text style={styles.eventDescription}>{event.description}</Text>
             )}
+
+            {event.parkingInfo && (
+              <Text style={styles.eventDetail}>
+                Parking: {event.parkingInfo}
+              </Text>
+            )}
+
+            {event.specialNotes && (
+              <Text style={styles.eventDetail}>
+                Notes: {event.specialNotes}
+              </Text>
+            )}
+
             <View style={styles.divider} />
           </View>
         );
@@ -120,10 +165,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 10,
     borderRadius: 10,
-    // backgroundColor: "#fdebd0",
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#000",
     marginBottom: 5,
@@ -138,7 +182,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   eventSection: {
-    marginBottom: 20,
+    marginBottom: 30,
     padding: 15,
     backgroundColor: "#ffffff",
     borderRadius: 8,
@@ -149,16 +193,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#000",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   eventDetail: {
     fontSize: 14,
-    marginBottom: 4,
+    marginBottom: 6,
     color: "#2e4053",
   },
   eventDescription: {
     fontSize: 12,
     marginTop: 10,
+    marginBottom: 10,
     color: "#7f8c8d",
     fontStyle: "italic",
   },
@@ -174,7 +219,165 @@ const styles = StyleSheet.create({
     color: "#6e2c00",
     fontStyle: "italic",
   },
+  imageContainer: {
+    marginBottom: 15,
+    textAlign: "center",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 500, // Match the maxHeight of the image
+  },
+  eventImage: {
+    maxWidth: "100%",
+    maxHeight: 500,
+    marginBottom: 10,
+    borderRadius: 4,
+    objectFit: "contain",
+  },
 });
+
+const EventCard = ({ eventKey, onClick }) => {
+  const event = eventDetails[eventKey];
+  if (!event) return null;
+
+  return (
+    <motion.div onClick={onClick}>
+      <Card
+        className="event-card"
+        style={{
+          borderLeft: `4px solid ${event.color}`,
+          cursor: "pointer",
+          overflow: "hidden",
+          height: "100%",
+        }}
+      >
+        <div className="event-card-content">
+          <div className="event-details">
+            <h3 className="event-name">{event.name}</h3>
+            <div className="event-date">
+              <CalendarOutlined /> {event.date}
+            </div>
+            <div className="event-time">
+              <ClockCircleOutlined /> {event.time}
+            </div>
+            <div className="event-dresscode">
+              <Tag color={event.color}>{event.dressCode}</Tag>
+            </div>
+          </div>
+          <div className="view-more-btn">
+            <Button
+              style={{ background: "#333", color: "#fff" }}
+              type="text"
+              icon={<DownloadOutlined />}
+            >
+              View Details
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </motion.div>
+  );
+};
+
+const EventModal = ({ eventKey, visible, onClose }) => {
+  const event = eventDetails[eventKey];
+  if (!event) return null;
+
+  return (
+    <Modal
+      open={visible}
+      onCancel={onClose}
+      footer={null}
+      centered
+      width={800}
+      className="event-modal"
+      bodyStyle={{ padding: 0 }}
+    >
+      <div className="event-modal-container">
+        <div className="event-modal-image">
+          <Image
+            src={event.image}
+            alt={event.name}
+            preview={false}
+            style={{
+              width: "100%",
+              height: "",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </div>
+
+        <div className="event-modal-content" style={{ padding: "24px" }}>
+          <Title level={2} className="event-modal-title">
+            {event.name}
+          </Title>
+
+          <Descriptions column={1} bordered>
+            <Descriptions.Item label="Date">
+              <CalendarOutlined /> {event.date}
+            </Descriptions.Item>
+            <Descriptions.Item label="Time">
+              <ClockCircleOutlined /> {event.time}
+            </Descriptions.Item>
+            <Descriptions.Item label="Location">
+              <EnvironmentOutlined /> {event.location}
+            </Descriptions.Item>
+            <Descriptions.Item label="Dress Code">
+              {event.dressCode}
+            </Descriptions.Item>
+            {event.parkingInfo && (
+              <Descriptions.Item label="Parking">
+                {event.parkingInfo}
+              </Descriptions.Item>
+            )}
+          </Descriptions>
+
+          {event.description && (
+            <>
+              <Divider />
+              <Paragraph strong>Event Description:</Paragraph>
+              <Paragraph>{event.description}</Paragraph>
+            </>
+          )}
+
+          {event.specialNotes && (
+            <>
+              <Divider />
+              <Paragraph strong>Special Notes:</Paragraph>
+              <Paragraph>{event.specialNotes}</Paragraph>
+            </>
+          )}
+
+          <div
+            className="event-modal-actions"
+            style={{ marginTop: "24px", textAlign: "center" }}
+          >
+            <PDFDownloadLink
+              document={
+                <EventDetailsPDF
+                  guest={{ name: "Guest" }}
+                  events={[eventKey]}
+                />
+              }
+              fileName={`${event.name}_details.pdf`}
+            >
+              {({ loading }) => (
+                <Button
+                  type="primary"
+                  icon={<DownloadOutlined />}
+                  loading={loading}
+                >
+                  {loading ? "Preparing..." : "Download Details"}
+                </Button>
+              )}
+            </PDFDownloadLink>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+};
 
 const RSVPForm = () => {
   const { guestId } = useParams();
@@ -184,7 +387,7 @@ const RSVPForm = () => {
   const [error, setError] = useState(null);
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     const fetchGuest = async () => {
@@ -224,10 +427,12 @@ const RSVPForm = () => {
         };
 
         guestData.invitedEvents.forEach((event) => {
-          initialValues.events[event] =
-            guestData.rsvpStatus?.[event] || "pending";
-          initialValues.additionalGuests[event] =
-            guestData.additionalGuests?.[event] || 0;
+          if (eventDetails[event]) {
+            initialValues.events[event] =
+              guestData.rsvpStatus?.[event] || "pending";
+            initialValues.additionalGuests[event] =
+              guestData.additionalGuests?.[event] || 0;
+          }
         });
 
         form.setFieldsValue(initialValues);
@@ -252,10 +457,12 @@ const RSVPForm = () => {
 
       const cleanedAdditionalGuests = {};
       Object.keys(additionalGuests).forEach((event) => {
-        cleanedAdditionalGuests[event] =
-          values.events?.[event] === "accepted"
-            ? additionalGuests[event] || 0
-            : 0;
+        if (eventDetails[event]) {
+          cleanedAdditionalGuests[event] =
+            values.events?.[event] === "accepted"
+              ? additionalGuests[event] || 0
+              : 0;
+        }
       });
 
       const updateData = {
@@ -280,10 +487,6 @@ const RSVPForm = () => {
     }
   };
 
-  const handleContinue = () => {
-    setShowWelcome(true);
-  };
-
   if (loading) {
     return (
       <Spin
@@ -297,10 +500,6 @@ const RSVPForm = () => {
     return <Alert message="Error" description={error} type="error" showIcon />;
   }
 
-  if (showWelcome) {
-    ("");
-  }
-
   return (
     <div className="rsvp-container">
       <Card className="rsvp-card">
@@ -308,61 +507,52 @@ const RSVPForm = () => {
           <Link to="/">
             <HomeOutlined style={{ fontSize: "16px", color: "#000" }} />
           </Link>
-
           <h2 className="">/</h2>
           <h2 className="daspi">rsvp</h2>
         </div>
-          <h2 className="rsvp_ttle">Wedding RSVP</h2>
+        <h2 className="rsvp_ttle">Wedding RSVP</h2>
 
-          <Title level={3} className="ty">
-            Hi {guest?.name}!
-          </Title>
-          <div className="lka">
-            <Text style={{ textAlign: "center" }} className="rsvpt">
-              We can't wait to celebrate our special day with you! Please let us
-              know if you'll be attending each event.
-            </Text>
-          </div>
+        <Title level={3} className="ty">
+          Hi {guest?.name}!
+        </Title>
+        <div className="lka">
+          <Text style={{ textAlign: "center" }} className="rsvpt">
+            We can't wait to celebrate our special day with you! Please let us
+            know if you'll be attending each event.
+          </Text>
+        </div>
         <div className="formier">
-
-          {/* <Divider /> */}
           <div className="event-details-section">
-            {/* <Title level={4} className="section-title">
-              Your Invited Events
-            </Title> */}
-            {/* <Divider /> */}
-
             <Row gutter={[16, 16]}>
-              {guest?.invitedEvents?.map((eventKey) => {
-                const event = eventDetails[eventKey];
-                return (
-                  <Col xs={24} sm={12} key={eventKey}>
-                    <Card className="malika">
-                      <Badge.Ribbon text={event.name} color="#722ed1">
-                        <div className="event-content">
-                          <Descriptions column={1} size="small">
-                            <Descriptions.Item label="Date">
-                              {event.date}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Time">
-                              {event.time}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Location">
-                              {event.location}
-                            </Descriptions.Item>
-                          </Descriptions>
-                        </div>
-                      </Badge.Ribbon>
-                    </Card>
-                  </Col>
-                );
-              })}
+              {guest?.invitedEvents?.map((eventKey) => (
+                <Col xs={24} sm={12} key={eventKey}>
+                  <EventCard
+                    eventKey={eventKey}
+                    onClick={() => setSelectedEvent(eventKey)}
+                  />
+                </Col>
+              ))}
             </Row>
           </div>
 
+          <AnimatePresence>
+            {selectedEvent && (
+              <EventModal
+                eventKey={selectedEvent}
+                visible={!!selectedEvent}
+                onClose={() => setSelectedEvent(null)}
+              />
+            )}
+          </AnimatePresence>
+
           <Divider />
 
-          <Form className="dull" form={form} onFinish={onFinish} layout="vertical">
+          <Form
+            className="dull"
+            form={form}
+            onFinish={onFinish}
+            layout="vertical"
+          >
             {guest?.invitedEvents?.map((event) => {
               const maxAdditional = (guest.eventGuests?.[event] || 1) - 1;
               const eventInfo = eventDetails[event];
@@ -487,15 +677,15 @@ const RSVPForm = () => {
                   >
                     {({ loading }) => (
                       <Button
-                        style={{ border: "none", textDecoration: "underline" }}
                         type="default"
                         size="large"
                         block
                         loading={loading}
+                        icon={<DownloadOutlined />}
                       >
                         {loading
                           ? "Preparing PDF..."
-                          : "Download Event Details"}
+                          : "Download All Event Details"}
                       </Button>
                     )}
                   </PDFDownloadLink>

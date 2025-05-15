@@ -47,20 +47,35 @@ const ProtectedRoute = ({ children }) => {
 
 function AppLayout() {
   const location = useLocation();
-  const isRSVPPage = location.pathname.startsWith("/rsvp");
+
+  // Define the paths where you want to hide Nav, MNav, and footer
+  const hideLayoutComponents = [
+    "/rsvp",
+    "/thank-you",
+    "/dashboard",
+    "/login"
+  ];
+
+  // Check if current route starts with any of the paths to hide
+  const shouldHideLayout = hideLayoutComponents.some((path) =>
+    location.pathname.startsWith(path)
+  );
 
   return (
     <Layout className="layout">
-      {!isRSVPPage && <></>}
       <Content style={{ padding: "0 0px" }}>
         <div className="site-layout-content">
-          <div className="gal">
-            <Nav />
-          </div>
+          {!shouldHideLayout && (
+            <>
+              <div className="gal">
+                <Nav />
+              </div>
+              <div className="nal">
+                <MNav />
+              </div>
+            </>
+          )}
 
-          <div className="nal">
-            <MNav />
-          </div>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
@@ -75,12 +90,16 @@ function AppLayout() {
             <Route path="/rsvp/:guestId" element={<RSVPForm />} />
             <Route path="/thank-you" element={<ThankYouPage />} />
           </Routes>
-          <div className="footer">© 2025 Nikhil & Shivani</div>
+
+          {!shouldHideLayout && (
+            <div className="footer">© 2025 Nikhil & Shivani</div>
+          )}
         </div>
       </Content>
     </Layout>
   );
 }
+
 
 function App() {
   return (
