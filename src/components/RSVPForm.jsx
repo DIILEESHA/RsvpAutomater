@@ -319,14 +319,14 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
             <Descriptions.Item label="Dress Code">
               {event.dressCode}
             </Descriptions.Item>
-            {event.parkingInfo && (
+            {/* {event.parkingInfo && (
               <Descriptions.Item label="Parking">
                 {event.parkingInfo}
               </Descriptions.Item>
-            )}
+            )} */}
           </Descriptions>
 
-          {event.description && (
+          {/* {event.description && (
             <>
               <Divider />
               <Paragraph strong>Event Description:</Paragraph>
@@ -340,7 +340,7 @@ const EventModal = React.memo(({ eventKey, visible, onClose }) => {
               <Paragraph strong>Special Notes:</Paragraph>
               <Paragraph>{event.specialNotes}</Paragraph>
             </>
-          )}
+          )} */}
 
           {/* <div className="event-modal-actions" style={{ marginTop: "24px", textAlign: "center" }}>
             <PDFDownloadLink
