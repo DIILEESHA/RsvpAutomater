@@ -107,7 +107,7 @@ const Header = () => {
     });
   };
 
-  const date = "June 24, 2023 · Lake Garda, Italy";
+  const date = "On Saturday 16th August 225";
 
   return (
     <motion.div
